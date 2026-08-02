@@ -1,0 +1,9 @@
+{
+  "name": "item.difficultyplus.bias.unmoored",
+  "colour": "#8B3DC4",
+  "weight": 1,
+  "rarity": "epic",
+  "bias": { "min": -4, "max": 0 },
+  "pierce": { "floor": true, "ceiling": false },
+  "verifiers": [ { "min_zone_level": 8 } ]
+}

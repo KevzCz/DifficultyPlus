@@ -1,0 +1,20 @@
+architectury {
+    common rootProject.enabled_platforms.split(',')
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+
+    modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
+
+    modCompileOnly "curse.maven:dungeon-difficulty-645559:$rootProject.dungeon_difficulty_fabric"
+
+    modCompileOnly "maven.modrinth:tiny-config:3.0.0-fabric"
+
+    modCompileOnly("curse.maven:xaeros-minimap-263420:$rootProject.xaero_minimap_fabric") { transitive = false }
+    modCompileOnly("curse.maven:xaeros-world-map-317780:$rootProject.xaero_worldmap_fabric") { transitive = false }
+
+    modCompileOnly("me.shedaniel.cloth:cloth-config-fabric:$rootProject.cloth_config_version") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+}

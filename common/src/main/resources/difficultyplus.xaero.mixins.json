@@ -1,0 +1,15 @@
+{
+  "required": false,
+  "package": "net.pixeldreamstudios.difficultyplus.mixin.xaero",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+    "MinimapHandlerMixin",
+    "MinimapRegistryMixin",
+    "WorldMapHandlerMixin",
+    "WorldMapRegistryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

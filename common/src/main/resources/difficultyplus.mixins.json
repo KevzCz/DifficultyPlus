@@ -1,0 +1,39 @@
+{
+  "required": true,
+  "package": "net.pixeldreamstudios.difficultyplus.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+    "client.BaseListEntryAccessor",
+    "client.CastPoseMixin",
+    "client.ClientDisconnectMixin",
+    "client.HideHeldItemMixin",
+    "client.MultiElementListEntryAccessor",
+    "client.SocketFlashMixin"
+  ],
+  "mixins": [
+    "ChunkSendMixin",
+    "ConfigMixin",
+    "DifficultyChoiceMixin",
+    "DifficultyResultMixin",
+    "DifficultyTypeMixin",
+    "DifficultyTypesMixin",
+    "DimensionMixin",
+    "DungeonDifficultyMixin",
+    "EntityMatcherMixin",
+    "EntityOwnerMixin",
+    "EntityScalingMixin",
+    "LateGearMixin",
+    "LivingEntityDamageMixin",
+    "LivingEntityZoneMixin",
+    "LootTableFillMixin",
+    "PlayerCastingMixin",
+    "ServerLevelMixin",
+    "StructurePlacementMixin",
+    "StructureStartMixin",
+    "ZoneMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

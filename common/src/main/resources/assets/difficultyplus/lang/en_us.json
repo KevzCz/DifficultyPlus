@@ -1,0 +1,58 @@
+{
+  "itemGroup.difficultyplus.reliquary": "Difficulty+ Reliquary",
+
+  "item.difficultyplus.hollow_skull": "Hollow Skull",
+  "item.difficultyplus.sapphire_of_renewal": "Sapphire of Renewal",
+  "item.difficultyplus.garnet_of_fate": "Garnet of Fate",
+  "item.difficultyplus.skull_of_renewal": "Skull of Renewal",
+  "item.difficultyplus.skull_of_fate": "Skull of Fate",
+
+  "tooltip.difficultyplus.hollow_skull": "One empty socket. Right-click a gem onto it.",
+  "tooltip.difficultyplus.sapphire_hint": "Socket into a Hollow Skull to restore a structure.",
+  "tooltip.difficultyplus.garnet_hint": "Socket into a Hollow Skull to reforge a structure's fate.",
+  "tooltip.difficultyplus.skull_of_renewal": "Hold to survey. Use to restore the structure.",
+  "tooltip.difficultyplus.skull_of_fate": "Hold to survey. Use to rebuild and re-roll its level.",
+
+  "tooltip.difficultyplus.gem_fused": "The gem has fused; it cannot be removed",
+  "tooltip.difficultyplus.bias_shift": "Shifts the rolled level by %s",
+  "tooltip.difficultyplus.pierce_floor": "Ignores the zone's minimum",
+  "tooltip.difficultyplus.pierce_ceiling": "Ignores the zone's maximum",
+
+  "item.difficultyplus.bias.plain": "Unremarkable",
+  "item.difficultyplus.bias.steady": "Steady",
+  "item.difficultyplus.bias.wavering": "Wavering",
+  "item.difficultyplus.bias.ascendant": "Ascendant",
+  "item.difficultyplus.bias.diminished": "Diminished",
+  "item.difficultyplus.bias.unmoored": "Unmoored",
+
+  "message.difficultyplus.no_structure": "No structure in range",
+  "message.difficultyplus.no_range": "This zone has no level range to re-roll",
+  "message.difficultyplus.disabled": "Structure refresh is disabled",
+  "message.difficultyplus.blacklisted": "This structure cannot be refreshed",
+  "message.difficultyplus.cooling": "On cooldown for another %ss",
+  "message.difficultyplus.blocked": "Refused: %s player-placed key block(s) inside",
+  "message.difficultyplus.interrupted": "The ritual falters",
+  "message.difficultyplus.failed": "Nothing happens",
+  "message.difficultyplus.refreshed": "Restored %s chunk(s) · %s block(s) cleared · %s entity(ies) banished",
+
+  "key.categories.difficultyplus": "Difficulty+",
+  "key.difficultyplus.toggle_overlay": "Toggle Zone Overlay",
+
+  "message.difficultyplus.overlay_on": "Zone overlay shown",
+  "message.difficultyplus.overlay_off": "Zone overlay hidden",
+
+  "difficultyplus.damagetype.is_fire": "Fire",
+  "difficultyplus.damagetype.is_freezing": "Freezing",
+  "difficultyplus.damagetype.is_explosion": "Explosion",
+  "difficultyplus.damagetype.is_projectile": "Projectile",
+  "difficultyplus.damagetype.is_fall": "Falling",
+  "difficultyplus.damagetype.is_drowning": "Drowning",
+  "difficultyplus.damagetype.is_lightning": "Lightning",
+  "difficultyplus.damagetype.magic": "Magic",
+  "difficultyplus.damagetype.indirect_magic": "Indirect Magic",
+  "difficultyplus.damagetype.wither": "Wither",
+  "difficultyplus.damagetype.lava": "Lava",
+  "difficultyplus.damagetype.campfire": "Campfire",
+  "difficultyplus.damagetype.falling_block": "Falling Block",
+  "difficultyplus.damagetype.damage_over_time": "Damage Over Time"
+}

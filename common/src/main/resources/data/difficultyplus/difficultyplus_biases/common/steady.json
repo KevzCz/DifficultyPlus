@@ -1,0 +1,8 @@
+{
+  "name": "item.difficultyplus.bias.steady",
+  "colour": "#C43D3D",
+  "weight": 60,
+  "rarity": "common",
+  "bias": { "min": 0, "max": 1 },
+  "pierce": { "floor": false, "ceiling": false }
+}

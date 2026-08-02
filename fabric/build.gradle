@@ -1,0 +1,115 @@
+plugins {
+    id "me.modmuss50.mod-publish-plugin" version "2.1.1"
+    id 'com.gradleup.shadow'
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+configurations {
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+
+    shadowBundle {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
+
+    modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
+
+    modImplementation "curse.maven:dungeon-difficulty-645559:$rootProject.dungeon_difficulty_fabric"
+
+    modLocalRuntime "maven.modrinth:tiny-config:3.0.0-fabric"
+
+    modCompileOnly "com.terraformersmc:modmenu:$rootProject.mod_menu_version"
+    modLocalRuntime "com.terraformersmc:modmenu:$rootProject.mod_menu_version"
+
+    modLocalRuntime("me.shedaniel.cloth:cloth-config-fabric:$rootProject.cloth_config_version") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    modCompileOnly("me.shedaniel.cloth:cloth-config-fabric:$rootProject.cloth_config_version") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive = false }
+    shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('fabric.mod.json') {
+        expand version: inputs.properties.version
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowBundle]
+    archiveClassifier = 'dev-shadow'
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+}
+
+publishMods {
+    dryRun = gradle.startParameter.taskNames.any { it.contains("publishModsDry") }
+
+    file = tasks.remapJar.archiveFile
+    displayName = "Difficulty+ [FABRIC] [${rootProject.minecraft_version}] - [${project.version}]"
+    type = STABLE
+    modLoaders.add("fabric")
+
+    def changelogFile = rootProject.file("CHANGELOG.md")
+    def changelogText = changelogFile.exists() ? changelogFile.text : ""
+    changelog = changelogText.trim().isEmpty() ? "No changelog provided." : changelogText
+
+    curseforge {
+        projectId = "1636332"
+        accessToken = providers.gradleProperty("cfToken")
+            .orElse(providers.environmentVariable("CF_TOKEN"))
+        minecraftVersions.add("1.21.1")
+        javaVersions.add(JavaVersion.VERSION_21)
+        clientRequired = true
+        serverRequired = true
+    }
+
+    modrinth {
+        projectId = "zbD8ULDT"
+        accessToken = providers.gradleProperty("modrinthToken")
+            .orElse(providers.environmentVariable("MODRINTH_TOKEN"))
+        minecraftVersions.add("1.21.1")
+    }
+}
+
+tasks.register("publishModsDry", Copy) {
+    group = "upload"
+    description = "Dry run of publishMods — writes to build/unified-dry/ instead of uploading."
+
+    def publishTasks = tasks.withType(me.modmuss50.mpp.PublishModTask)
+    dependsOn publishTasks
+
+    from(publishTasks.collect { it.dryRunDirectory }) {
+        include "**/*.jar"
+    }
+    into rootProject.layout.buildDirectory.dir("unified-dry")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+tasks.named("publishMods") { group = "upload" }
+tasks.withType(me.modmuss50.mpp.PublishModTask).configureEach {
+    group = "upload"
+}

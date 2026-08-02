@@ -1,0 +1,8 @@
+{
+  "name": "item.difficultyplus.bias.diminished",
+  "colour": "#6E6A7A",
+  "weight": 4,
+  "rarity": "rare",
+  "bias": { "min": -3, "max": -1 },
+  "pierce": { "floor": false, "ceiling": false }
+}

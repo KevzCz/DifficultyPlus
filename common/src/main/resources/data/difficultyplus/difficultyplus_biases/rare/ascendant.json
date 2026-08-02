@@ -1,0 +1,9 @@
+{
+  "name": "item.difficultyplus.bias.ascendant",
+  "colour": "#E8A33D",
+  "weight": 10,
+  "rarity": "rare",
+  "bias": { "min": 2, "max": 4 },
+  "pierce": { "floor": false, "ceiling": false },
+  "verifiers": [ { "min_zone_level": 6 } ]
+}
