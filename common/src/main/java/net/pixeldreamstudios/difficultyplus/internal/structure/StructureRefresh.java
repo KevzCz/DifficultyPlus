@@ -168,7 +168,9 @@ public final class StructureRefresh {
     private static int place(ServerLevel level, StructureStart start, String ownerKey,
                              Vec3 origin, RefreshQueue.Completion onDone) {
         BoundingBox box = start.getBoundingBox();
-        RandomSource random = RandomSource.create(level.getSeed() ^ box.getCenter().asLong());
+        RandomSource random = RandomSource.create(level.getSeed()
+                ^ box.getCenter().asLong()
+                ^ (level.getGameTime() * 0x9E3779B97F4A7C15L));
 
         LongSet occupied = new LongOpenHashSet();
         for (StructurePiece piece : start.getPieces()) {

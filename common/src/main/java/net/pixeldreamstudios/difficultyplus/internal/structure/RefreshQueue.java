@@ -10,7 +10,10 @@ import net.minecraft.server.level.TicketType;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.phys.AABB;
@@ -230,6 +233,8 @@ public final class RefreshQueue {
     }
 
     private static int clearBlocksIn(ServerLevel level, Job job, ChunkPos chunk) {
+        clearContainersIn(level, job, chunk);
+
         if (job.placements == null || job.placements.length == 0) {
             return 0;
         }
@@ -246,6 +251,28 @@ public final class RefreshQueue {
             removed++;
         }
         return removed;
+    }
+
+    private static void clearContainersIn(ServerLevel level, Job job, ChunkPos chunk) {
+        LevelChunk loaded = level.getChunkSource().getChunkNow(chunk.x, chunk.z);
+        if (loaded == null) {
+            return;
+        }
+
+        List<BlockPos> containers = new ArrayList<>();
+        for (BlockPos pos : loaded.getBlockEntitiesPos()) {
+            if (job.box.isInside(pos)
+                    && loaded.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity) {
+                containers.add(pos);
+            }
+        }
+
+        for (BlockPos pos : containers) {
+            if (level.getBlockEntity(pos) instanceof Container container) {
+                container.clearContent();
+            }
+            level.removeBlockEntity(pos);
+        }
     }
 
     private static int clearEntitiesIn(ServerLevel level, Job job, ChunkPos chunk) {
