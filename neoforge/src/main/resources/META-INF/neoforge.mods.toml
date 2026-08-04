@@ -1,13 +1,13 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
 #issueTrackerURL = ""
-license = "Insert License Here"
+license = "MIT"
 
 [[mods]]
 modId = "difficultyplus"
 version = "${version}"
 displayName = "Difficulty+"
-authors = "PixelDreamStudios"
+authors = "KevzCz"
 description = '''
 An addon for Dungeon Difficulty.
 '''
