@@ -80,6 +80,7 @@ public final class BlockHighlight {
         marker.setGlowingTag(true);
         marker.setInvulnerable(true);
         marker.setNoGravity(true);
+        marker.addTag(StructureOutline.TRANSIENT_TAG);
 
         if (!level.addFreshEntity(marker)) {
             DifficultyPlus.LOGGER.warn("Difficulty+ highlight: could not spawn marker at {}", pos);
@@ -132,5 +133,12 @@ public final class BlockHighlight {
         if (previous != null) {
             previous.markers().forEach(marker -> marker.display().discard());
         }
+    }
+
+    public static void clearAll() {
+        for (Session session : ACTIVE.values()) {
+            session.markers().forEach(marker -> marker.display().discard());
+        }
+        ACTIVE.clear();
     }
 }

@@ -11,6 +11,8 @@ dependencies {
 
     modCompileOnly "maven.modrinth:tiny-config:3.0.0-fabric"
 
+    modCompileOnly("curse.maven:puffish-skills-835091:$rootProject.puffish_skills_fabric") { transitive = false }
+
     modCompileOnly("curse.maven:xaeros-minimap-263420:$rootProject.xaero_minimap_fabric") { transitive = false }
     modCompileOnly("curse.maven:xaeros-world-map-317780:$rootProject.xaero_worldmap_fabric") { transitive = false }
 

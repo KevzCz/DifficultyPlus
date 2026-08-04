@@ -5,6 +5,8 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.dungeon_difficulty.config.Config;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.pixeldreamstudios.difficultyplus.client.zone.ZoneChunkCache;
+import net.pixeldreamstudios.difficultyplus.client.zone.ZoneRefresh;
 import net.pixeldreamstudios.difficultyplus.config.ClientData;
 import net.pixeldreamstudios.difficultyplus.config.LevelColours;
 import net.pixeldreamstudios.difficultyplus.internal.ClientConfig;
@@ -29,6 +31,7 @@ public final class DifficultyPlusConfigScreen {
                 .setSavingRunnable(() -> {
                     ClientConfig.save();
                     ConfigSaver.saveAndReload();
+                    ZoneRefresh.requestFullRedraw();
                 });
 
         general(builder, config);

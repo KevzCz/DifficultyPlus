@@ -21,10 +21,13 @@ public class LevelColours {
 
     public static List<Stop> defaults() {
         List<Stop> out = new ArrayList<>();
-        out.add(new Stop(1, "#4C9A52"));
-        out.add(new Stop(10, "#C9B23A"));
-        out.add(new Stop(20, "#D4813C"));
-        out.add(new Stop(31, "#A53A2F"));
+        out.add(new Stop(1, "#2ECC71"));
+        out.add(new Stop(6, "#3498DB"));
+        out.add(new Stop(11, "#F1C40F"));
+        out.add(new Stop(16, "#E67E22"));
+        out.add(new Stop(21, "#E74C3C"));
+        out.add(new Stop(26, "#9B59B6"));
+        out.add(new Stop(31, "#ECF0F1"));
         return out;
     }
 
@@ -32,38 +35,13 @@ public class LevelColours {
         if (stops == null || stops.isEmpty()) {
             return 0xFFFFFF;
         }
-        Stop below = null;
-        Stop above = null;
+        Stop banded = null;
         for (Stop stop : stops) {
-            if (stop.level <= level && (below == null || stop.level > below.level)) {
-                below = stop;
-            }
-            if (stop.level >= level && (above == null || stop.level < above.level)) {
-                above = stop;
+            if (stop.level <= level && (banded == null || stop.level > banded.level)) {
+                banded = stop;
             }
         }
-        if (below == null) {
-            return parse(above.colour);
-        }
-        if (above == null || above.level == below.level) {
-            return parse(below.colour);
-        }
-        float t = (level - below.level) / (float) (above.level - below.level);
-        return blend(parse(below.colour), parse(above.colour), t);
-    }
-
-    private static int blend(int from, int to, float t) {
-        int red = channel(from, 16, to, t);
-        int green = channel(from, 8, to, t);
-        int blue = channel(from, 0, to, t);
-        return (red << 16) | (green << 8) | blue;
-    }
-
-    private static int channel(int from, int shift, int to, float t) {
-        int a = (from >> shift) & 0xFF;
-        int b = (to >> shift) & 0xFF;
-        int value = (int) (a + (b - a) * t);
-        return Math.max(0, Math.min(255, value));
+        return parse((banded == null ? stops.get(0) : banded).colour);
     }
 
     public static int parse(String colour) {

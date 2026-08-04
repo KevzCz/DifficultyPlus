@@ -6,7 +6,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.pixeldreamstudios.difficultyplus.config.LevelGapData;
 import net.pixeldreamstudios.difficultyplus.internal.DifficultyPlusInternals;
+import net.pixeldreamstudios.difficultyplus.internal.level.LevelGap;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,6 +62,18 @@ public final class DifficultyPlusAPI {
 
     public static List<ResistanceInfo> playerResistancesAt(ServerLevel level, BlockPos pos) {
         return DifficultyPlusInternals.playerResistancesAt(level, pos);
+    }
+
+    public static OptionalInt playerLevel(ServerPlayer player) {
+        return LevelGap.playerLevel(player);
+    }
+
+    public static OptionalInt levelGap(ServerPlayer viewer, LivingEntity mob) {
+        return LevelGap.gap(viewer, mob);
+    }
+
+    public static Optional<LevelGapData.Threat> threatOf(ServerPlayer viewer, LivingEntity mob) {
+        return LevelGap.threat(viewer, mob);
     }
 
     public static Optional<String> zoneNameOf(LivingEntity entity) {

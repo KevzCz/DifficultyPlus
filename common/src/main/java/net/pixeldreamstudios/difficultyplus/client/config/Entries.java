@@ -5,6 +5,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
 import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
 import net.minecraft.network.chat.Component;
+import net.pixeldreamstudios.difficultyplus.config.LevelColours;
 import java.util.ArrayList;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -46,6 +47,14 @@ public final class Entries {
                 .build();
     }
 
+    public static AbstractConfigListEntry<?> colour(String label, String value,
+                                                    Consumer<String> setter) {
+        return builder().startColorField(text(label), LevelColours.parse(value))
+                .setDefaultValue(0xFFFFFF)
+                .setSaveConsumer(rgb -> setter.accept(String.format("#%06X", rgb & 0xFFFFFF)))
+                .build();
+    }
+
     public static AbstractConfigListEntry<?> requiredString(String label,
                                                             String value,
                                                             Consumer<String> setter) {
@@ -58,6 +67,15 @@ public final class Entries {
     public static AbstractConfigListEntry<?> integer(String label, int value, Consumer<Integer> setter) {
         return builder().startIntField(text(label), value)
                 .setDefaultValue(0)
+                .setSaveConsumer(setter)
+                .build();
+    }
+
+    public static AbstractConfigListEntry<?> decimal(String label, float value,
+                                                     Consumer<Float> setter, String tooltip) {
+        return builder().startFloatField(text(label), value)
+                .setDefaultValue(0f)
+                .setTooltip(text(tooltip))
                 .setSaveConsumer(setter)
                 .build();
     }

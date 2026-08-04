@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -48,6 +49,30 @@ public final class SurveyTracker {
             }
             survey(level, player, held);
         }
+    }
+
+    public static void onLeave(ServerPlayer player) {
+        StructureOutline.clear(player);
+        BlockHighlight.clear(player);
+        LAST_BLOCKED.remove(player.getUUID());
+    }
+
+    public static void clearAll() {
+        StructureOutline.clearAll();
+        BlockHighlight.clearAll();
+        LAST_BLOCKED.clear();
+    }
+
+    public static int sweepStrays(ServerLevel level) {
+        clearAll();
+        int removed = 0;
+        for (Entity entity : level.getAllEntities()) {
+            if (entity.getTags().contains(StructureOutline.TRANSIENT_TAG)) {
+                entity.discard();
+                removed++;
+            }
+        }
+        return removed;
     }
 
     private static ItemStack heldSkull(ServerPlayer player) {

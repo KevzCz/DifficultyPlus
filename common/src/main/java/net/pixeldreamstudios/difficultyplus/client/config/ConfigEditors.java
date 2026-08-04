@@ -9,6 +9,7 @@ import net.pixeldreamstudios.difficultyplus.config.DifficultyPlusData;
 import net.pixeldreamstudios.difficultyplus.config.DimensionData;
 import net.pixeldreamstudios.difficultyplus.config.DistanceScaling;
 import net.pixeldreamstudios.difficultyplus.config.LevelColours;
+import net.pixeldreamstudios.difficultyplus.config.LevelGapData;
 import net.pixeldreamstudios.difficultyplus.config.GlobalData;
 import net.pixeldreamstudios.difficultyplus.config.ZoneData;
 import net.pixeldreamstudios.difficultyplus.internal.ConfigAccess;
@@ -61,10 +62,66 @@ public final class ConfigEditors {
                 Entries.group("zone_map", zoneMap(data.zone_map == null
                         ? data.zone_map = new GlobalData.ZoneMap()
                         : data.zone_map)),
+                Entries.group("level_gap", levelGap(data.level_gap == null
+                        ? data.level_gap = new LevelGapData()
+                        : data.level_gap)),
                 Entries.group("late_equipment", lateEquipment(data.late_equipment == null
                         ? data.late_equipment = new GlobalData.LateEquipment()
                         : data.late_equipment)),
                 Entries.group("structure_refresh", structureRefresh(data.structure_refresh)));
+    }
+
+    public static List<AbstractConfigListEntry<?>> levelGap(LevelGapData value) {
+        return Entries.of(
+                Entries.toggle("enabled", value.enabled, v -> value.enabled = v,
+                        "Tilts combat by the gap between a player's skill level and a mob's"
+                                + " level. Needs Puffish Skills."),
+                Entries.stringList("categories", value.categories,
+                        v -> value.categories = v),
+                Entries.decimal("player_scale", value.player_scale,
+                        v -> value.player_scale = v),
+                Entries.integer("green_gap", value.green_gap, v -> value.green_gap = v),
+                Entries.integer("orange_gap", value.orange_gap, v -> value.orange_gap = v),
+                Entries.integer("red_gap", value.red_gap, v -> value.red_gap = v),
+                Entries.group("player_below", levelGapHalf(value.player_below == null
+                        ? value.player_below = new LevelGapData.Half()
+                        : value.player_below)),
+                Entries.group("player_above", levelGapHalf(value.player_above == null
+                        ? value.player_above = new LevelGapData.Half()
+                        : value.player_above)),
+                Entries.group("mob_vs_mob", mobVsMob(value.mob_vs_mob == null
+                        ? value.mob_vs_mob = new LevelGapData.MobVsMob()
+                        : value.mob_vs_mob)));
+    }
+
+    public static List<AbstractConfigListEntry<?>> mobVsMob(LevelGapData.MobVsMob value) {
+        return Entries.of(
+                Entries.toggle("enabled", value.enabled, v -> value.enabled = v,
+                        "Tilts mob-on-mob damage by the gap between their zone levels. Only"
+                                + " dealt_per_level is used. Does not need Puffish Skills."),
+                Entries.group("attacker_below", levelGapHalf(value.attacker_below == null
+                        ? value.attacker_below = new LevelGapData.Half()
+                        : value.attacker_below)),
+                Entries.group("attacker_above", levelGapHalf(value.attacker_above == null
+                        ? value.attacker_above = new LevelGapData.Half()
+                        : value.attacker_above)));
+    }
+
+    public static List<AbstractConfigListEntry<?>> levelGapHalf(LevelGapData.Half value) {
+        return Entries.of(
+                Entries.toggle("enabled", value.enabled, v -> value.enabled = v),
+                Entries.decimal("dealt_per_level", value.dealt_per_level,
+                        v -> value.dealt_per_level = v),
+                Entries.decimal("taken_per_level", value.taken_per_level,
+                        v -> value.taken_per_level = v),
+                Entries.decimal("min_multiplier", value.min_multiplier,
+                        v -> value.min_multiplier = v,
+                        "Floor for both multipliers. 0.25 means damage never drops below a"
+                                + " quarter."),
+                Entries.decimal("max_multiplier", value.max_multiplier,
+                        v -> value.max_multiplier = v,
+                        "Ceiling for both multipliers. 2.0 means damage never more than"
+                                + " doubles."));
     }
 
     public static List<AbstractConfigListEntry<?>> zoneMap(GlobalData.ZoneMap value) {
@@ -205,7 +262,7 @@ public final class ConfigEditors {
 
                 Entries.group("difficultyplus", Entries.of(
                         Entries.group("distance_scaling", distanceScaling(
-                                dimensionData(value).distance_scaling)))),
+                                dimensionData(value).distance_scaling, true)))),
 
                 Entries.objectList("zones", value.zones, v -> value.zones = v,
                         Config.Zone::new, ConfigEditors::labelZone, ConfigEditors::zone, true),
@@ -340,22 +397,36 @@ public final class ConfigEditors {
     public static List<AbstractConfigListEntry<?>> levelStop(LevelColours.Stop value) {
         return Entries.of(
                 Entries.integer("level", value.level, v -> value.level = v),
-                Entries.string("colour", value.colour, v -> value.colour = v,
-                        "Hex colour such as #4C9A52."));
+                Entries.colour("colour", value.colour, v -> value.colour = v));
     }
 
     public static List<AbstractConfigListEntry<?>> distanceScaling(DistanceScaling value) {
-        return Entries.of(
-                Entries.toggle("enabled", value.enabled, v -> value.enabled = v,
-                        "Adds levels with distance from world spawn."),
-                Entries.toggle("override", value.override, v -> value.override = v,
-                        "On a zone: use this block instead of the dimension's, even when"
-                                + " disabled. This is how a zone opts out."),
-                Entries.integer("grace_radius", value.grace_radius,
-                        v -> value.grace_radius = v),
-                Entries.integer("per_blocks", value.per_blocks, v -> value.per_blocks = v),
-                Entries.integer("add_level", value.add_level, v -> value.add_level = v),
-                Entries.integer("max_add", value.max_add, v -> value.max_add = v));
+        return distanceScaling(value, false);
+    }
+
+    public static List<AbstractConfigListEntry<?>> distanceScaling(DistanceScaling value,
+                                                                   boolean dimensionLevel) {
+        List<AbstractConfigListEntry<?>> entries = new ArrayList<>();
+        entries.add(Entries.toggle("enabled", value.enabled, v -> value.enabled = v,
+                "Adds levels with distance from world spawn."));
+
+        if (dimensionLevel) {
+            entries.add(Entries.toggle("scale_fallback", value.scale_fallback,
+                    v -> value.scale_fallback = v,
+                    "Also scale positions where no zone matched, using this dimension's"
+                            + " own difficulty."));
+        } else {
+            entries.add(Entries.toggle("override", value.override, v -> value.override = v,
+                    "Use this block instead of the dimension's, even when disabled."
+                            + " This is how a zone opts out."));
+        }
+
+        entries.add(Entries.integer("grace_radius", value.grace_radius,
+                v -> value.grace_radius = v));
+        entries.add(Entries.integer("per_blocks", value.per_blocks, v -> value.per_blocks = v));
+        entries.add(Entries.integer("add_level", value.add_level, v -> value.add_level = v));
+        entries.add(Entries.integer("max_add", value.max_add, v -> value.max_add = v));
+        return entries;
     }
 
     public static List<AbstractConfigListEntry<?>> levelRange(ZoneData.LevelRange range) {

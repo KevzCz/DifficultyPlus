@@ -16,6 +16,7 @@ public final class ZoneClientNetwork {
                     ZoneChunkCache.setWorldId(worldId());
                     ZoneChunkCache.setTable(payload.configHash(), payload.zones());
                     ZoneChunkCache.loadCurrent();
+                    ZoneRefresh.requestFullRedraw();
                 }));
 
         NetworkManager.registerReceiver(NetworkManager.Side.S2C,
@@ -29,7 +30,11 @@ public final class ZoneClientNetwork {
                                 payload.quartZones()[i],
                                 payload.quartLevels()[i]);
                     }
-                    ZoneRefresh.requestPending();
+                    if (ZoneChunkCache.consumeTableReset()) {
+                        ZoneRefresh.requestFullRedraw();
+                    } else {
+                        ZoneRefresh.requestPending();
+                    }
                 }));
     }
 

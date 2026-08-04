@@ -37,6 +37,8 @@ dependencies {
 
     modImplementation "curse.maven:dungeon-difficulty-645559:$rootProject.dungeon_difficulty_neoforge"
 
+    modCompileOnly("curse.maven:puffish-skills-835091:$rootProject.puffish_skills_neoforge") { transitive = false }
+
     modCompileOnly("curse.maven:xaeros-minimap-263420:$rootProject.xaero_minimap_neoforge") { transitive = false }
     modCompileOnly("curse.maven:xaeros-world-map-317780:$rootProject.xaero_worldmap_neoforge") { transitive = false }
 

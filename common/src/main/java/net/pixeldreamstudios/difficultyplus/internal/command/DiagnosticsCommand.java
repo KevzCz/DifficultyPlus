@@ -1,5 +1,6 @@
 package net.pixeldreamstudios.difficultyplus.internal.command;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.dungeon_difficulty.config.Config;
 import net.dungeon_difficulty.logic.PatternMatching;
 import net.dungeon_difficulty.logic.ScalingGoal;
@@ -13,13 +14,20 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.pixeldreamstudios.difficultyplus.api.StructureKey;
 import net.pixeldreamstudios.difficultyplus.DifficultyPlus;
 import net.pixeldreamstudios.difficultyplus.config.DistanceScaling;
+import net.pixeldreamstudios.difficultyplus.compat.PuffishSkills;
+import net.pixeldreamstudios.difficultyplus.config.LevelGapData;
 import net.pixeldreamstudios.difficultyplus.config.ZoneData;
+import net.pixeldreamstudios.difficultyplus.internal.level.LevelGap;
 import net.pixeldreamstudios.difficultyplus.internal.ConfigBridge;
 import net.pixeldreamstudios.difficultyplus.internal.level.LevelStore;
 import net.pixeldreamstudios.difficultyplus.internal.level.StructureLevelAccess;
@@ -163,6 +171,14 @@ public final class DiagnosticsCommand {
                 return;
             }
         }
+        DistanceScaling fallback = LevelRoll.scalingFor(level, pos, null);
+        if (fallback != null && fallback.scale_fallback) {
+            int bonus = fallback.addedFor(level.getSharedSpawnPos(), pos);
+            detail(source, "range", "no zone matched — dimension fallback "
+                    + result.difficulty().level() + " + " + bonus
+                    + " = " + Math.max(0, result.difficulty().level() + bonus));
+            return;
+        }
         detail(source, "range", "no zone entry with a level_range matched");
     }
 
@@ -293,6 +309,59 @@ public final class DiagnosticsCommand {
         } catch (Throwable t) {
             DifficultyPlus.LOGGER.error("Difficulty+ highlight failed", t);
         }
+    }
+
+    public static int levelGap(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        line(source, "Difficulty+ level gap", ChatFormatting.GOLD);
+
+        LevelGapData data = LevelGap.config();
+        detail(source, "enabled", String.valueOf(data.enabled));
+        detail(source, "puffish loaded", String.valueOf(PuffishSkills.isLoaded()));
+        detail(source, "categories in config", data.categories.isEmpty()
+                ? "(empty = all)" : String.join(", ", data.categories));
+        detail(source, "categories present", PuffishSkills.categoryIds().isEmpty()
+                ? "(none)" : String.join(", ", PuffishSkills.categoryIds()));
+
+        OptionalInt playerLevel = LevelGap.playerLevel(player);
+        detail(source, "player level", playerLevel.isEmpty()
+                ? "EMPTY (no unlocked category with experience)"
+                : String.valueOf(playerLevel.getAsInt()));
+
+        LivingEntity target = lookTarget(player);
+        if (target == null) {
+            detail(source, "target", "none — look at a mob within 32 blocks");
+            return 1;
+        }
+        detail(source, "target", target.getType().toString());
+
+        OptionalInt mobLevel = LevelGap.mobLevel(target);
+        detail(source, "mob level", mobLevel.isEmpty()
+                ? "EMPTY (entity has no stamped zone)" : String.valueOf(mobLevel.getAsInt()));
+
+        detail(source, "mob vs mob", String.valueOf(LevelGap.mobVsMobActive()));
+
+        OptionalInt gap = LevelGap.gap(player, target);
+        if (gap.isEmpty()) {
+            detail(source, "gap", "EMPTY — no scaling applied");
+            return 1;
+        }
+        detail(source, "gap", String.valueOf(gap.getAsInt()));
+        detail(source, "threat", LevelGap.threatOf(gap.getAsInt(), data).name());
+        detail(source, "dealt multiplier",
+                String.valueOf(LevelGap.dealtMultiplier(player, target)));
+        detail(source, "taken multiplier",
+                String.valueOf(LevelGap.takenMultiplier(player, target)));
+        return 1;
+    }
+
+    private static LivingEntity lookTarget(ServerPlayer player) {
+        Vec3 eye = player.getEyePosition();
+        Vec3 end = eye.add(player.getLookAngle().scale(32));
+        EntityHitResult hit = ProjectileUtil.getEntityHitResult(player, eye, end,
+                player.getBoundingBox().expandTowards(player.getLookAngle().scale(32)).inflate(1),
+                entity -> entity instanceof LivingEntity && entity != player, 32 * 32);
+        return hit == null ? null : (LivingEntity) hit.getEntity();
     }
 
     private static void line(CommandSourceStack source, String text, ChatFormatting colour) {

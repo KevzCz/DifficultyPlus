@@ -20,6 +20,16 @@ public final class ZoneRefresh {
         }
     }
 
+    public static void requestFullRedraw() {
+        if (LISTENERS.isEmpty()) {
+            return;
+        }
+        ZoneChunkCache.drainDirty();
+        for (Listener listener : LISTENERS) {
+            listener.onRegionsChanged(LongSet.of(), true);
+        }
+    }
+
     public static void requestPending() {
         LongSet dirty = ZoneChunkCache.drainDirty();
         if (dirty.isEmpty() || LISTENERS.isEmpty()) {

@@ -15,6 +15,7 @@ import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.pixeldreamstudios.difficultyplus.api.StructureKey;
 import net.pixeldreamstudios.difficultyplus.api.ZoneContext;
 import net.pixeldreamstudios.difficultyplus.DifficultyPlus;
+import net.pixeldreamstudios.difficultyplus.internal.structure.SurveyTracker;
 import net.pixeldreamstudios.difficultyplus.internal.level.LevelStore;
 import net.pixeldreamstudios.difficultyplus.internal.level.StructureLevelAccess;
 import net.pixeldreamstudios.difficultyplus.internal.zone.StructureLookup;
@@ -36,6 +37,8 @@ public final class LevelCommands {
                         .then(Commands.literal("clear").executes(LevelCommands::clear)))
                 .then(Commands.literal("why")
                         .executes(context -> DiagnosticsCommand.why(context.getSource())))
+                .then(Commands.literal("levelgap")
+                        .executes(context -> DiagnosticsCommand.levelGap(context.getSource())))
                 .then(Commands.literal("structure")
                         .then(Commands.literal("refresh")
                                 .executes(context ->
@@ -48,8 +51,17 @@ public final class LevelCommands {
                                         .executes(context ->
                                                 DiagnosticsCommand.clearCooldown(
                                                         context.getSource())))))
-                .then(Commands.literal("debug").executes(LevelCommands::toggleDebug));
+                .then(Commands.literal("debug").executes(LevelCommands::toggleDebug))
+                .then(Commands.literal("sweepmarkers").executes(LevelCommands::sweepMarkers));
         dispatcher.register(root);
+    }
+
+    private static int sweepMarkers(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        int removed = SurveyTracker.sweepStrays(source.getLevel());
+        source.sendSuccess(() -> Component.literal(
+                "Removed " + removed + " leftover marker(s)."), true);
+        return removed;
     }
 
     private static int toggleDebug(CommandContext<CommandSourceStack> context) {

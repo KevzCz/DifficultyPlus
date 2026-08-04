@@ -1,32 +1,33 @@
 package net.pixeldreamstudios.difficultyplus.compat.xaero;
 
 import it.unimi.dsi.fastutil.longs.LongSet;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.ChunkPos;
+import xaero.map.MapProcessor;
+import xaero.map.WorldMapSession;
 import xaero.map.highlight.DimensionHighlighterHandler;
+import xaero.map.region.LeveledRegion;
+import xaero.map.region.MapRegion;
+import xaero.map.world.MapDimension;
+import xaero.map.world.MapWorld;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class WorldMapRefresh {
     private WorldMapRefresh() {}
 
-    private static final List<DimensionHighlighterHandler> HANDLERS = new ArrayList<>();
-
-    public static void track(DimensionHighlighterHandler handler) {
-        if (handler != null && !HANDLERS.contains(handler)) {
-            HANDLERS.add(handler);
-        }
-    }
-
     public static void refresh(LongSet regions, boolean full) {
-        if (HANDLERS.isEmpty()) {
+        MapDimension dimension = dimension();
+        if (dimension == null) {
             return;
         }
-        for (DimensionHighlighterHandler handler : HANDLERS) {
-            if (full) {
-                handler.clearCachedHashes();
-                continue;
-            }
+        DimensionHighlighterHandler handler = dimension.getHighlightHandler();
+        if (handler == null) {
+            return;
+        }
+        if (full) {
+            handler.clearCachedHashes();
+        } else {
             for (long key : regions) {
                 if (key == Long.MIN_VALUE) {
                     continue;
@@ -35,5 +36,47 @@ public final class WorldMapRefresh {
                 handler.clearCachedHash(region.x, region.z);
             }
         }
+        redraw(dimension, regions, full);
+    }
+
+    private static void redraw(MapDimension dimension, LongSet regions, boolean full) {
+        WorldMapSession session = WorldMapSession.getCurrentSession();
+        if (session == null) {
+            return;
+        }
+        MapProcessor processor = session.getMapProcessor();
+        if (processor == null) {
+            return;
+        }
+        List<LeveledRegion<?>> loaded = dimension.getLayeredMapRegions().getLoadedListUnsynced();
+        if (loaded == null) {
+            return;
+        }
+        for (LeveledRegion<?> region : List.copyOf(loaded)) {
+            if (!(region instanceof MapRegion leaf)) {
+                continue;
+            }
+            if (!full && !regions.contains(ChunkPos.asLong(leaf.getRegionX(), leaf.getRegionZ()))) {
+                continue;
+            }
+            leaf.updateTargetHighlightsHash();
+            leaf.requestRefresh(processor);
+        }
+    }
+
+    private static MapDimension dimension() {
+        Minecraft client = Minecraft.getInstance();
+        if (client == null || client.level == null) {
+            return null;
+        }
+        WorldMapSession session = WorldMapSession.getCurrentSession();
+        if (session == null || session.getMapProcessor() == null) {
+            return null;
+        }
+        MapWorld world = session.getMapProcessor().getMapWorld();
+        if (world == null) {
+            return null;
+        }
+        return world.getDimension(client.level.dimension());
     }
 }

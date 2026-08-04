@@ -28,6 +28,8 @@ public final class StructureOutline {
 
     private static final double SEGMENT = 24.0;
 
+    public static final String TRANSIENT_TAG = "difficultyplus_marker";
+
     private static final Map<UUID, Outline> ACTIVE = new ConcurrentHashMap<>();
 
     private static final class Outline {
@@ -151,6 +153,7 @@ public final class StructureOutline {
         tag.put("transformation", scale((float) scaleX, (float) scaleY, (float) scaleZ));
         marker.load(tag);
         marker.setGlowingTag(true);
+        marker.addTag(TRANSIENT_TAG);
 
         if (level.addFreshEntity(marker)) {
             into.add(marker);
@@ -188,6 +191,13 @@ public final class StructureOutline {
         if (outline != null) {
             outline.markers.forEach(Display.BlockDisplay::discard);
         }
+    }
+
+    public static void clearAll() {
+        for (Outline outline : ACTIVE.values()) {
+            outline.markers.forEach(Display.BlockDisplay::discard);
+        }
+        ACTIVE.clear();
     }
 
     public static boolean isLocked(ServerPlayer player) {

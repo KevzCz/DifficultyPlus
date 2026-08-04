@@ -32,6 +32,8 @@ import net.pixeldreamstudios.difficultyplus.internal.ConfigBridge;
 import net.pixeldreamstudios.difficultyplus.internal.level.LevelStore;
 import net.pixeldreamstudios.difficultyplus.internal.level.StructureLevelAccess;
 import net.pixeldreamstudios.difficultyplus.internal.zone.LevelRoll;
+import net.pixeldreamstudios.difficultyplus.internal.zone.ZoneChunkSync;
+import net.pixeldreamstudios.difficultyplus.internal.zone.ZoneResolver;
 import net.pixeldreamstudios.difficultyplus.item.SocketData;
 import net.pixeldreamstudios.difficultyplus.item.bias.BiasDefinition;
 
@@ -114,6 +116,11 @@ public final class StructureRefresh {
 
         access.difficultyplus$setPlacements(null);
         access.difficultyplus$setRefreshedAt(level.getGameTime());
+
+        if (rerollAllowed) {
+            ZoneResolver.invalidate();
+            ZoneChunkSync.resend(level, start.getBoundingBox());
+        }
 
         return Result.done(chunks, 0, 0);
     }

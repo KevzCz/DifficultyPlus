@@ -53,6 +53,8 @@ public final class ZoneChunkCache {
 
     private static boolean hashKnown;
 
+    private static boolean tableReset;
+
     private static String worldId;
 
     public static void setTable(int hash, List<ZoneInfo> zones) {
@@ -67,8 +69,17 @@ public final class ZoneChunkCache {
             BY_DIMENSION.clear();
             LOADED.clear();
             ZoneStore.wipe(worldId);
+            tableReset = true;
         }
         markAllDirty();
+    }
+
+    public static boolean consumeTableReset() {
+        if (!tableReset) {
+            return false;
+        }
+        tableReset = false;
+        return true;
     }
 
     public static void put(ResourceLocation dimension, long chunk, int zoneId, int level) {
@@ -156,10 +167,14 @@ public final class ZoneChunkCache {
         LOADED.add(dimension);
         Long2ObjectMap<Entry> loaded = ZoneStore.read(world, dimension, configHash);
         if (loaded != null && !loaded.isEmpty()) {
-            BY_DIMENSION.merge(dimension, loaded, (existing, stored) -> {
-                stored.putAll(existing);
-                return stored;
-            });
+            Long2ObjectMap<Entry> live = BY_DIMENSION.get(dimension);
+            if (live == null) {
+                BY_DIMENSION.put(dimension, loaded);
+            } else {
+                for (Long2ObjectMap.Entry<Entry> stored : loaded.long2ObjectEntrySet()) {
+                    live.putIfAbsent(stored.getLongKey(), stored.getValue());
+                }
+            }
             markAllDirty();
         }
     }

@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.pixeldreamstudios.difficultyplus.api.StructureKey;
+import net.pixeldreamstudios.difficultyplus.config.DistanceScaling;
 import net.pixeldreamstudios.difficultyplus.config.ZoneData;
 import net.pixeldreamstudios.difficultyplus.internal.ConfigAccess;
 import net.pixeldreamstudios.difficultyplus.DifficultyPlus;
@@ -43,7 +44,18 @@ public final class RolledLevel {
         } else {
             ResourceLocation matchedId = result.matchId();
             if (matchedId == null) {
-                return difficulty;
+                DistanceScaling scaling = LevelRoll.scalingFor(level, pos, null);
+                int bonus = scaling == null || !scaling.scale_fallback
+                        ? 0
+                        : scaling.addedFor(level.getSharedSpawnPos(), pos);
+                int shifted = Math.max(0, difficulty.level() + bonus);
+                recordOrigin(difficulty.type().name, shifted, null);
+                if (bonus == 0) {
+                    return difficulty;
+                }
+                return new Difficulty(difficulty.type(), shifted,
+                        Math.max(0, difficulty.entityLevel() + bonus),
+                        Math.max(0, difficulty.rewardLevel() + bonus));
             }
             Optional<StructureKey> key = StructureLookup.keyAt(level, pos, matchedId);
             rolled = LevelRoll.resolve(

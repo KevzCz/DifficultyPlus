@@ -18,6 +18,10 @@ public final class MinimapRefresh {
         }
     }
 
+    public static void reset() {
+        HANDLERS.clear();
+    }
+
     public static void refresh(LongSet regions, boolean full) {
         if (HANDLERS.isEmpty()) {
             return;

@@ -108,6 +108,7 @@ public final class ZoneTable {
         hash = hash * 31 + scaling.per_blocks;
         hash = hash * 31 + scaling.add_level;
         hash = hash * 31 + scaling.max_add;
+        hash = hash * 31 + (scaling.scale_fallback ? 1 : 0);
         return hash;
     }
 
@@ -121,6 +122,15 @@ public final class ZoneTable {
                 }
                 hash = hash * 31 + scalingHash(
                         ConfigBridge.forDimension(dimension).distance_scaling);
+                if (dimension.entities != null) {
+                    for (Config.EntityMatcher matcher : dimension.entities) {
+                        if (matcher == null || matcher.difficulty == null) {
+                            continue;
+                        }
+                        hash = hash * 31 + String.valueOf(matcher.difficulty.name).hashCode();
+                        hash = hash * 31 + matcher.difficulty.level;
+                    }
+                }
                 for (Config.Zone zone : dimension.zones) {
                     hash = hash * 31 + String.valueOf(
                             zone.zone_matches == null ? "" : zone.zone_matches.structure).hashCode();
@@ -129,6 +139,7 @@ public final class ZoneTable {
                     hash = hash * 31 + (zone.difficulty == null ? 0
                             : String.valueOf(zone.difficulty.name).hashCode() + zone.difficulty.level);
                     hash = hash * 31 + rangeHash(zone);
+                    hash = hash * 31 + scalingHash(ConfigBridge.forZone(zone).distance_scaling);
                 }
             }
         }

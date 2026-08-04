@@ -9,6 +9,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.pixeldreamstudios.difficultyplus.api.ZoneContext;
@@ -140,6 +141,27 @@ public final class ZoneChunkSync {
         sent.put(key, packed);
         QUEUE.computeIfAbsent(player.getUUID(), id -> new ArrayList<>())
                 .add(new Pending(key, zoneId, levelValue, quartZones, quartLevels));
+    }
+
+    public static void resend(ServerLevel level, BoundingBox box) {
+        if (!enabled() || box == null) {
+            return;
+        }
+        for (int x = box.minX() >> 4; x <= box.maxX() >> 4; x++) {
+            for (int z = box.minZ() >> 4; z <= box.maxZ() >> 4; z++) {
+                long key = ChunkPos.asLong(x, z);
+                for (Long2IntMap sent : SENT.values()) {
+                    sent.remove(key);
+                }
+            }
+        }
+        for (ServerPlayer player : level.players()) {
+            for (int x = box.minX() >> 4; x <= box.maxX() >> 4; x++) {
+                for (int z = box.minZ() >> 4; z <= box.maxZ() >> 4; z++) {
+                    onChunkSent(player, new ChunkPos(x, z));
+                }
+            }
+        }
     }
 
     public static void flush(ServerLevel level) {

@@ -8,6 +8,8 @@ public class DistanceScaling {
 
     public boolean override = false;
 
+    public boolean scale_fallback = true;
+
     public int grace_radius = 0;
 
     public int per_blocks = 1000;

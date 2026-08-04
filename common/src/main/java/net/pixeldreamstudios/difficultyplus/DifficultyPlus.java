@@ -15,6 +15,7 @@ import net.pixeldreamstudios.difficultyplus.api.DifficultyPlusAPI;
 import net.pixeldreamstudios.difficultyplus.internal.command.LevelCommands;
 import net.pixeldreamstudios.difficultyplus.internal.ConfigValidator;
 import net.pixeldreamstudios.difficultyplus.internal.damage.ConfigResistanceProvider;
+import net.pixeldreamstudios.difficultyplus.internal.damage.LevelGapResistance;
 import net.pixeldreamstudios.difficultyplus.internal.effect.BuiltInEffects;
 import net.pixeldreamstudios.difficultyplus.internal.level.BuiltInResolvers;
 import net.pixeldreamstudios.difficultyplus.internal.structure.OwnershipStamp;
@@ -101,6 +102,7 @@ public final class DifficultyPlus {
         BuiltInEffects.register();
         BuiltInResolvers.register();
         DifficultyPlusAPI.registerResistanceProvider(new ConfigResistanceProvider());
+        DifficultyPlusAPI.registerResistanceProvider(new LevelGapResistance());
         PlacementTracker.register();
         OwnershipStamp.register();
 

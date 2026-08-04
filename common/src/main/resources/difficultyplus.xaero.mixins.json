@@ -6,7 +6,6 @@
   "client": [
     "MinimapHandlerMixin",
     "MinimapRegistryMixin",
-    "WorldMapHandlerMixin",
     "WorldMapRegistryMixin"
   ],
   "injectors": {

@@ -10,6 +10,8 @@ public class GlobalData {
 
     public int biome_fill_budget = 2;
 
+    public LevelGapData level_gap = new LevelGapData();
+
     public LateEquipment late_equipment = new LateEquipment();
 
     public StructureRefresh structure_refresh = new StructureRefresh();
@@ -50,15 +52,15 @@ public class GlobalData {
 
         public float hollow_skull_chance = 0.08f;
 
-        public int hollow_skull_min_level = 3;
+        public int hollow_skull_min_level = 1;
 
         public float sapphire_chance = 0.03f;
 
-        public int sapphire_min_level = 5;
+        public int sapphire_min_level = 2;
 
         public float garnet_chance = 0.01f;
 
-        public int garnet_min_level = 8;
+        public int garnet_min_level = 3;
 
         public List<String> key_blocks = List.of(
                 "minecraft:chest",
