@@ -347,7 +347,6 @@ public final class DiagnosticsCommand {
             return 1;
         }
         detail(source, "gap", String.valueOf(gap.getAsInt()));
-        detail(source, "threat", LevelGap.threatOf(gap.getAsInt(), data).name());
         detail(source, "dealt multiplier",
                 String.valueOf(LevelGap.dealtMultiplier(player, target)));
         detail(source, "taken multiplier",

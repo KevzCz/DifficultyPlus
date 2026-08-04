@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.server.level.ServerPlayer;
-import net.pixeldreamstudios.difficultyplus.config.LevelGapData;
 import net.pixeldreamstudios.difficultyplus.internal.DifficultyPlusInternals;
 import net.pixeldreamstudios.difficultyplus.internal.level.LevelGap;
 
@@ -72,9 +71,35 @@ public final class DifficultyPlusAPI {
         return LevelGap.gap(viewer, mob);
     }
 
-    public static Optional<LevelGapData.Threat> threatOf(ServerPlayer viewer, LivingEntity mob) {
-        return LevelGap.threat(viewer, mob);
+    public static boolean levelGapActive() {
+        return LevelGap.active();
     }
+
+    public static <T> Optional<T> bandOf(ServerPlayer viewer, LivingEntity mob,
+                                         List<GapBand<T>> bands) {
+        OptionalInt gap = LevelGap.gap(viewer, mob);
+        return gap.isEmpty() ? Optional.empty() : bandFor(gap.getAsInt(), bands);
+    }
+
+    public static <T> Optional<T> bandFor(int gap, List<GapBand<T>> bands) {
+        if (bands == null || bands.isEmpty()) {
+            return Optional.empty();
+        }
+        T matched = null;
+        int best = Integer.MIN_VALUE;
+        for (GapBand<T> band : bands) {
+            if (band == null || gap < band.minGap()) {
+                continue;
+            }
+            if (band.minGap() >= best) {
+                best = band.minGap();
+                matched = band.value();
+            }
+        }
+        return Optional.ofNullable(matched);
+    }
+
+    public record GapBand<T>(int minGap, T value) {}
 
     public static Optional<String> zoneNameOf(LivingEntity entity) {
         return DifficultyPlusInternals.zoneNameOf(entity);

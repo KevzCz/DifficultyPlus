@@ -9,7 +9,6 @@ import net.pixeldreamstudios.difficultyplus.config.LevelGapData;
 import net.pixeldreamstudios.difficultyplus.internal.ConfigBridge;
 import net.pixeldreamstudios.difficultyplus.internal.DifficultyPlusInternals;
 
-import java.util.Optional;
 import java.util.OptionalInt;
 
 public final class LevelGap {
@@ -59,28 +58,6 @@ public final class LevelGap {
             return OptionalInt.empty();
         }
         return OptionalInt.of(player.getAsInt() - target.getAsInt());
-    }
-
-    public static Optional<LevelGapData.Threat> threat(ServerPlayer viewer, LivingEntity mob) {
-        LevelGapData data = config();
-        if (!data.enabled) {
-            return Optional.empty();
-        }
-        OptionalInt gap = gap(viewer, mob);
-        return gap.isEmpty() ? Optional.empty() : Optional.of(threatOf(gap.getAsInt(), data));
-    }
-
-    public static LevelGapData.Threat threatOf(int gap, LevelGapData data) {
-        if (gap <= -Math.max(1, data.red_gap)) {
-            return LevelGapData.Threat.RED;
-        }
-        if (gap <= -Math.max(1, data.orange_gap)) {
-            return LevelGapData.Threat.ORANGE;
-        }
-        if (gap >= Math.max(1, data.green_gap)) {
-            return LevelGapData.Threat.GREEN;
-        }
-        return LevelGapData.Threat.WHITE;
     }
 
     public static boolean mobVsMobActive() {

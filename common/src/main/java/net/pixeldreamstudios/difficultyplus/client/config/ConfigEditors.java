@@ -80,9 +80,6 @@ public final class ConfigEditors {
                         v -> value.categories = v),
                 Entries.decimal("player_scale", value.player_scale,
                         v -> value.player_scale = v),
-                Entries.integer("green_gap", value.green_gap, v -> value.green_gap = v),
-                Entries.integer("orange_gap", value.orange_gap, v -> value.orange_gap = v),
-                Entries.integer("red_gap", value.red_gap, v -> value.red_gap = v),
                 Entries.group("player_below", levelGapHalf(value.player_below == null
                         ? value.player_below = new LevelGapData.Half()
                         : value.player_below)),

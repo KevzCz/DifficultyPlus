@@ -10,12 +10,6 @@ public class LevelGapData {
 
     public float player_scale = 1.0f;
 
-    public int orange_gap = 5;
-
-    public int red_gap = 10;
-
-    public int green_gap = 5;
-
     public Half player_below = new Half(true, 0.15f, 0.10f);
 
     public Half player_above = new Half(false, 0.10f, 0.05f);
@@ -64,10 +58,4 @@ public class LevelGapData {
         }
     }
 
-    public enum Threat {
-        GREEN,
-        WHITE,
-        ORANGE,
-        RED
-    }
 }
