@@ -10,7 +10,8 @@ import net.minecraft.server.level.TicketType;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.Container;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -268,10 +269,16 @@ public final class RefreshQueue {
         }
 
         for (BlockPos pos : containers) {
-            if (level.getBlockEntity(pos) instanceof Container container) {
-                container.clearContent();
+            if (!(level.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity container)) {
+                continue;
             }
-            level.removeBlockEntity(pos);
+            ResourceKey<LootTable> table = ((LootOriginAccess) container)
+                    .difficultyplus$originalLootTable();
+            container.clearContent();
+            if (table != null) {
+                container.setLootTable(table, level.getRandom().nextLong());
+            }
+            container.setChanged();
         }
     }
 

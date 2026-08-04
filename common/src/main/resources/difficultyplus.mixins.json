@@ -27,6 +27,7 @@
     "LevelGapDamageMixin",
     "LivingEntityDamageMixin",
     "LivingEntityZoneMixin",
+    "LootOriginMixin",
     "LootTableFillMixin",
     "MarkerSaveMixin",
     "PlayerCastingMixin",

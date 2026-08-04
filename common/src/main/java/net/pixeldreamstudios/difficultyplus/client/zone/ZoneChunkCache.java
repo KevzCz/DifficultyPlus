@@ -55,6 +55,8 @@ public final class ZoneChunkCache {
 
     private static boolean tableReset;
 
+    private static boolean pendingLoad;
+
     private static String worldId;
 
     public static void setTable(int hash, List<ZoneInfo> zones) {
@@ -182,9 +184,18 @@ public final class ZoneChunkCache {
     public static void loadCurrent() {
         Minecraft client = Minecraft.getInstance();
         if (client == null || client.level == null || worldId == null) {
+            pendingLoad = true;
             return;
         }
+        pendingLoad = false;
         load(worldId, client.level.dimension().location());
+    }
+
+    public static void tick() {
+        if (!pendingLoad || !hashKnown) {
+            return;
+        }
+        loadCurrent();
     }
 
     public static void save() {
@@ -203,6 +214,7 @@ public final class ZoneChunkCache {
         LOADED.clear();
         configHash = 0;
         hashKnown = false;
+        pendingLoad = false;
         worldId = null;
     }
 
