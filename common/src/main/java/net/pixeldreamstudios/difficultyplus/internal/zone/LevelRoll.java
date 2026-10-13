@@ -62,9 +62,10 @@ public final class LevelRoll {
 
         int min = range.lowestFor(configuredLevel, (pierce & 1) != 0, (pierce & 2) != 0);
         int max = range.highestFor(configuredLevel, (pierce & 1) != 0, (pierce & 2) != 0);
-        if (bias != 0) {
-            min = Math.max(0, min + bias);
-            max = Math.max(min, max + bias);
+        int shift = range.scaledBias(bias, min, max);
+        if (shift != 0) {
+            min = Math.max(0, min + shift);
+            max = Math.max(min, max + shift);
         }
         if (distance != 0) {
             min = Math.max(0, min + distance);
@@ -170,6 +171,24 @@ public final class LevelRoll {
         return null;
     }
 
+    public static int fillBudgetFor(ServerLevel level) {
+        int global = ConfigBridge.global().biome_fill_budget;
+        Config config = ConfigBridge.config();
+        if (config == null || config.dimensions == null) {
+            return global;
+        }
+        ResourceLocation dimensionId = level.dimension().location();
+        for (Config.Dimension dimension : config.dimensions) {
+            if (dimension.world_matches != null
+                    && !matchesDimension(dimensionId, dimension.world_matches.dimension)) {
+                continue;
+            }
+            Integer own = ConfigBridge.forDimension(dimension).biome_fill_budget;
+            return own == null ? global : own;
+        }
+        return global;
+    }
+
     public static int distanceBonus(ServerLevel level, BlockPos pos, ResourceLocation matchedId) {
         DistanceScaling scaling = scalingFor(level, pos, matchedId);
         return scaling == null ? 0 : scaling.addedFor(level.getSharedSpawnPos(), pos);
@@ -254,7 +273,7 @@ public final class LevelRoll {
             long patch = BiomePatch.idAt(level,
                     new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4),
                     range.biome_fill_cap,
-                    ConfigBridge.global().biome_fill_budget);
+                    fillBudgetFor(level));
             if (BiomePatch.isResolved(patch)) {
                 ChunkPos anchor = new ChunkPos(patch);
                 return StructureKey.of(id,

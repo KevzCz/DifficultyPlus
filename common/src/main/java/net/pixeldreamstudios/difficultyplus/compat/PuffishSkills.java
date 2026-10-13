@@ -6,9 +6,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.puffish.skillsmod.api.Category;
 import net.puffish.skillsmod.api.SkillsAPI;
 import net.pixeldreamstudios.difficultyplus.DifficultyPlus;
+import net.pixeldreamstudios.difficultyplus.config.LevelGapData;
 
 import java.util.List;
 import java.util.OptionalInt;
+import java.util.function.ToDoubleFunction;
 
 public final class PuffishSkills {
     private PuffishSkills() {}
@@ -25,11 +27,18 @@ public final class PuffishSkills {
     }
 
     public static OptionalInt totalLevel(ServerPlayer player, List<String> categories) {
+        return combinedLevel(player, categories, LevelGapData.Mode.SUM, id -> 1.0f);
+    }
+
+    public static OptionalInt combinedLevel(ServerPlayer player, List<String> categories,
+                                            LevelGapData.Mode mode, ToDoubleFunction<String> weightOf) {
         if (player == null || !isLoaded()) {
             return OptionalInt.empty();
         }
         try {
-            int total = 0;
+            double total = 0;
+            double highest = 0;
+            double weightSum = 0;
             boolean any = false;
 
             for (Category category : SkillsAPI.streamCategories().toList()) {
@@ -42,10 +51,24 @@ public final class PuffishSkills {
                 if (level == null) {
                     continue;
                 }
-                total += level;
+                double weight = weightOf.applyAsDouble(category.getId().toString());
+                if (weight <= 0) {
+                    continue;
+                }
+                total += level * weight;
+                highest = Math.max(highest, level * weight);
+                weightSum += weight;
                 any = true;
             }
-            return any ? OptionalInt.of(total) : OptionalInt.empty();
+            if (!any) {
+                return OptionalInt.empty();
+            }
+            double combined = switch (mode == null ? LevelGapData.Mode.SUM : mode) {
+                case SUM -> total;
+                case HIGHEST -> highest;
+                case AVERAGE -> total / weightSum;
+            };
+            return OptionalInt.of((int) Math.round(combined));
         } catch (Throwable t) {
             present = false;
             DifficultyPlus.LOGGER.warn("Difficulty+ could not read Puffish Skills levels", t);

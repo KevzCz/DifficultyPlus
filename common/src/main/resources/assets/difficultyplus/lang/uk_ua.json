@@ -1,30 +1,25 @@
 {
   "itemGroup.difficultyplus.reliquary": "Difficulty+ Reliquary",
-
   "item.difficultyplus.hollow_skull": "Порожній череп",
   "item.difficultyplus.sapphire_of_renewal": "Сапфір оновлення",
   "item.difficultyplus.garnet_of_fate": "Гранат долі",
   "item.difficultyplus.skull_of_renewal": "Череп оновлення",
   "item.difficultyplus.skull_of_fate": "Череп долі",
-
   "tooltip.difficultyplus.hollow_skull": "Одне порожнє гніздо. Натисніть ПКМ, щоб вставити самоцвіт.",
   "tooltip.difficultyplus.sapphire_hint": "Вставте в порожній череп, щоб відновити структуру.",
   "tooltip.difficultyplus.garnet_hint": "Вставте в порожній череп, щоб змінити долю структури.",
   "tooltip.difficultyplus.skull_of_renewal": "Утримуйте, щоб оглянути. Використайте, щоб відновити структуру.",
   "tooltip.difficultyplus.skull_of_fate": "Утримуйте, щоб оглянути. Використайте, щоб перебудувати та зробити рерол її рівня.",
-
   "tooltip.difficultyplus.gem_fused": "Самоцвіт злився; його неможливо вийняти",
   "tooltip.difficultyplus.bias_shift": "Зсуває отриманий рівень на %s",
   "tooltip.difficultyplus.pierce_floor": "Ігнорує мінімум зони",
   "tooltip.difficultyplus.pierce_ceiling": "Ігнорує максимум зони",
-
   "item.difficultyplus.bias.plain": "Непримітний",
   "item.difficultyplus.bias.steady": "Стійкий",
   "item.difficultyplus.bias.wavering": "Нестійкий",
   "item.difficultyplus.bias.ascendant": "Висхідний",
   "item.difficultyplus.bias.diminished": "Зменшений",
   "item.difficultyplus.bias.unmoored": "Відв'язаний",
-
   "message.difficultyplus.no_structure": "Немає структури в зоні дії",
   "message.difficultyplus.no_range": "Ця зона не має діапазону рівнів для реролу",
   "message.difficultyplus.disabled": "Оновлення структур вимкнено",
@@ -34,13 +29,10 @@
   "message.difficultyplus.interrupted": "Ритуал переривається",
   "message.difficultyplus.failed": "Нічого не відбувається",
   "message.difficultyplus.refreshed": "Відновлено %s чанк(ів) · %s блок(ів) очищено · %s сутність(ей) вигнано",
-
   "key.categories.difficultyplus": "Difficulty+",
   "key.difficultyplus.toggle_overlay": "Увімкнути/вимкнути оверлей зони",
-
   "message.difficultyplus.overlay_on": "Оверлей зони увімкнено",
   "message.difficultyplus.overlay_off": "Оверлей зони вимкнено",
-
   "difficultyplus.damagetype.is_fire": "Вогонь",
   "difficultyplus.damagetype.is_freezing": "Заморожування",
   "difficultyplus.damagetype.is_explosion": "Вибух",
@@ -54,5 +46,6 @@
   "difficultyplus.damagetype.lava": "Лава",
   "difficultyplus.damagetype.campfire": "Багаття",
   "difficultyplus.damagetype.falling_block": "Падаючий блок",
-  "difficultyplus.damagetype.damage_over_time": "Періодична шкода"
+  "difficultyplus.damagetype.damage_over_time": "Періодична шкода",
+  "difficultyplus.label.safe_zone": "Безпечна зона"
 }

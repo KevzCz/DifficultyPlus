@@ -10,6 +10,39 @@ public class LevelGapData {
 
     public float player_scale = 1.0f;
 
+    public Mode mode = Mode.SUM;
+
+    public List<CategoryWeight> weights = List.of();
+
+    public enum Mode {
+        SUM,
+        HIGHEST,
+        AVERAGE
+    }
+
+    public static class CategoryWeight {
+
+        public String category = "";
+
+        public float weight = 1.0f;
+    }
+
+    public float weightOf(String category) {
+        if (weights == null) {
+            return 1.0f;
+        }
+        for (CategoryWeight entry : weights) {
+            if (entry != null && category.equals(entry.category)) {
+                return Math.max(0f, entry.weight);
+            }
+        }
+        return 1.0f;
+    }
+
+    public Mode modeOrDefault() {
+        return mode == null ? Mode.SUM : mode;
+    }
+
     public Half player_below = new Half(true, 0.15f, 0.10f);
 
     public Half player_above = new Half(false, 0.10f, 0.05f);

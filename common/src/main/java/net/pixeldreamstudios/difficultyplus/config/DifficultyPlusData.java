@@ -11,6 +11,8 @@ public class DifficultyPlusData {
 
     public List<ZoneEffectEntry> zone_effects = List.of();
 
+    public String label;
+
     public static class ResistanceEntry {
 
         public String damage_type;

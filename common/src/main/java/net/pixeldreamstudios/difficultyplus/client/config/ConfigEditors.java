@@ -62,6 +62,9 @@ public final class ConfigEditors {
                 Entries.group("zone_map", zoneMap(data.zone_map == null
                         ? data.zone_map = new GlobalData.ZoneMap()
                         : data.zone_map)),
+                Entries.group("reward_curve", rewardCurve(data.reward_curve == null
+                        ? data.reward_curve = new GlobalData.RewardCurve()
+                        : data.reward_curve)),
                 Entries.group("level_gap", levelGap(data.level_gap == null
                         ? data.level_gap = new LevelGapData()
                         : data.level_gap)),
@@ -69,6 +72,12 @@ public final class ConfigEditors {
                         ? data.late_equipment = new GlobalData.LateEquipment()
                         : data.late_equipment)),
                 Entries.group("structure_refresh", structureRefresh(data.structure_refresh)));
+    }
+
+    public static List<AbstractConfigListEntry<?>> rewardCurve(GlobalData.RewardCurve value) {
+        return Entries.of(
+                Entries.decimal("scale", value.scale, v -> value.scale = v),
+                Entries.optionalInt("ceiling", value.ceiling, v -> value.ceiling = v));
     }
 
     public static List<AbstractConfigListEntry<?>> levelGap(LevelGapData value) {
@@ -80,6 +89,14 @@ public final class ConfigEditors {
                         v -> value.categories = v),
                 Entries.decimal("player_scale", value.player_scale,
                         v -> value.player_scale = v),
+                Entries.selector("mode", LevelGapData.Mode.values(), value.modeOrDefault(),
+                        v -> value.mode = v),
+                Entries.objectList("weights", value.weights, v -> value.weights = v,
+                        LevelGapData.CategoryWeight::new,
+                        w -> w.category == null || w.category.isEmpty() ? "(category)" : w.category + " x" + w.weight,
+                        w -> Entries.of(
+                                Entries.string("category", w.category, v -> w.category = v),
+                                Entries.decimal("weight", w.weight, v -> w.weight = v))),
                 Entries.group("player_below", levelGapHalf(value.player_below == null
                         ? value.player_below = new LevelGapData.Half()
                         : value.player_below)),
@@ -176,6 +193,7 @@ public final class ConfigEditors {
                         ConfigEditors::labelEntityModifier,
                         ConfigEditors::entityModifier),
                 Entries.group("difficultyplus", Entries.of(
+                        Entries.string("label", ours.label, v -> ours.label = v),
                         Entries.objectList("mob_resistances", ours.mob_resistances,
                                 v -> ours.mob_resistances = v,
                                 DifficultyPlusData.ResistanceEntry::new,
@@ -259,7 +277,9 @@ public final class ConfigEditors {
 
                 Entries.group("difficultyplus", Entries.of(
                         Entries.group("distance_scaling", distanceScaling(
-                                dimensionData(value).distance_scaling, true)))),
+                                dimensionData(value).distance_scaling, true)),
+                        Entries.optionalInt("biome_fill_budget", dimensionData(value).biome_fill_budget,
+                                v -> dimensionData(value).biome_fill_budget = v))),
 
                 Entries.objectList("zones", value.zones, v -> value.zones = v,
                         Config.Zone::new, ConfigEditors::labelZone, ConfigEditors::zone, true),
@@ -440,6 +460,8 @@ public final class ConfigEditors {
                                 + " region_size grid. Falls back to the grid when capped."),
                 Entries.integer("biome_fill_cap", range.biome_fill_cap,
                         v -> range.biome_fill_cap = v),
+                Entries.optionalDouble("bias_scale", range.bias_scale,
+                        v -> range.bias_scale = v),
                 Entries.toggle("lock_on_generation", range.lock_on_generation,
                         v -> range.lock_on_generation = v));
     }

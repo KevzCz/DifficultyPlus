@@ -44,6 +44,13 @@ Dungeon Difficulty, exactly as `/dungeon_difficulty_config_reload` does.
 |---|---|
 | `zone_poll_interval` | Ticks between zone re-evaluations for a given entity. Checks are staggered across entities, so this is a per-entity period, not a global sweep. Status effects refresh at twice this value so they do not flicker between polls. |
 | `resistance_reduction_cap` | Ceiling on stacked percentage resistance, so config cannot produce full immunity. Does **not** bound vulnerabilities. |
+| `biome_fill_budget` | Biome patch flood fills allowed per tick, per dimension. A dimension can override it (below). |
+| `reward_curve.scale` | Multiplies the level used for loot attribute values (`loot_scaling`). `0.5` makes a level 60 chest roll like level 30. Default `1.0`. |
+| `reward_curve.ceiling` | Optional cap on that level, so loot stops growing past it. The item still records its real level. |
+| `level_gap.mode` | How the listed Puffish categories combine into the player's level: `SUM` (default), `HIGHEST` or `AVERAGE`. |
+| `level_gap.weights` | Optional `[{ "category": "ns:id", "weight": 0.5 }]`. A category's level is multiplied by its weight; `0` ignores it. Unlisted categories weigh `1.0`. |
+
+On a dimension, `"difficultyplus": { "biome_fill_budget": 4 }` gives that dimension its own budget.
 
 ### Level ranges — on a zone, or on a per-entity entry
 
@@ -68,6 +75,7 @@ Randomizes a level per structure instance (on a zone) or per mob (on an entity e
 | `min` / `max` | The window. Equal values mean no randomization. |
 | `floor` / `ceiling` | Optional absolute bounds applied after the offset. Omit for unbounded. |
 | `lock_on_generation` | `true` freezes the rolled level into the structure's chunk NBT at generation; `false` (default) recomputes it on every read, so range edits re-level existing structures. |
+| `bias_scale` | Optional. Socketed bias points become a share of the window instead of flat levels: each point shifts the window by `bias_scale × (max − min)`, at least 1. Omit to keep flat biases. |
 
 `RELATIVE` is the default because one range block can then be shared across every tier of a pack:
 `-1…+1` with `floor: 1, ceiling: 6` gives `1–2` on a level 1 zone and `5–6` on a level 6 zone,
@@ -91,6 +99,16 @@ explicitly pinned — the same rule Dungeon Difficulty uses. A zone written as
 /difficultyplus level reroll     # new roll for that structure
 /difficultyplus level clear      # drop the override, back to the base roll
 ```
+
+### Zone label — on a difficulty type
+
+```json
+"difficultyplus": { "label": "difficultyplus.label.safe_zone" }
+```
+
+A label (a translation key, or plain text) shown before the type name in the zone announcement
+subtitle and above the zone name in map tooltips. The zone keeps its real level.
+Difficulty+ ships `difficultyplus.label.safe_zone` ("Safe Zone") in its own lang files.
 
 ### Resistances — on a difficulty type
 

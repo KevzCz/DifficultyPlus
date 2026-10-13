@@ -32,6 +32,16 @@ public class ZoneData {
 
         public boolean lock_on_generation = false;
 
+        public Double bias_scale = null;
+
+        public int scaledBias(int bias, int low, int high) {
+            if (bias == 0 || bias_scale == null || bias_scale <= 0) {
+                return bias;
+            }
+            int scaled = (int) Math.round(bias * bias_scale * Math.max(1, high - low));
+            return scaled == 0 ? Integer.signum(bias) : scaled;
+        }
+
         public boolean isValid() {
             return max >= min && (mode != Mode.ABSOLUTE || min >= 0);
         }

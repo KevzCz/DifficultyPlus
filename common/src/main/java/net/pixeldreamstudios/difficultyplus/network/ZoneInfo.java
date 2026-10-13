@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.ArrayList;
 import java.util.List;
 
-public record ZoneInfo(int id, String name, int colour, List<Resistance> resistances) {
+public record ZoneInfo(int id, String name, int colour, String label, List<Resistance> resistances) {
 
     public record Resistance(ResourceLocation damageId, boolean isTag, float percent, float flat,
                              String displayKey, String displayText,
@@ -46,6 +46,7 @@ public record ZoneInfo(int id, String name, int colour, List<Resistance> resista
         buf.writeVarInt(value.id());
         buf.writeUtf(value.name());
         buf.writeInt(value.colour());
+        buf.writeUtf(value.label() == null ? "" : value.label());
         buf.writeVarInt(value.resistances().size());
         for (Resistance resistance : value.resistances()) {
             Resistance.write(buf, resistance);
@@ -56,11 +57,12 @@ public record ZoneInfo(int id, String name, int colour, List<Resistance> resista
         int id = buf.readVarInt();
         String name = buf.readUtf();
         int colour = buf.readInt();
+        String label = buf.readUtf();
         int count = buf.readVarInt();
         List<Resistance> resistances = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             resistances.add(Resistance.read(buf));
         }
-        return new ZoneInfo(id, name, colour, List.copyOf(resistances));
+        return new ZoneInfo(id, name, colour, label.isEmpty() ? null : label, List.copyOf(resistances));
     }
 }

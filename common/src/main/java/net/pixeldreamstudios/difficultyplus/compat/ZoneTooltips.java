@@ -2,6 +2,7 @@ package net.pixeldreamstudios.difficultyplus.compat;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.pixeldreamstudios.difficultyplus.internal.zone.ZoneLabels;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.pixeldreamstudios.difficultyplus.client.zone.ZoneChunkCache;
@@ -34,6 +35,9 @@ public final class ZoneTooltips {
             return out;
         }
 
+        if (zone.label() != null) {
+            out.add(ZoneLabels.text(zone.label()).withStyle(ChatFormatting.GREEN));
+        }
         out.add(Component.literal(pretty(zone.name()))
                 .withStyle(style -> style.withColor(zone.colour()))
                 .append(Component.literal(" " + levelValue).withStyle(ChatFormatting.GRAY)));

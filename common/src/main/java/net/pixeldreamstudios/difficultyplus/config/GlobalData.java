@@ -12,6 +12,8 @@ public class GlobalData {
 
     public LevelGapData level_gap = new LevelGapData();
 
+    public RewardCurve reward_curve = new RewardCurve();
+
     public LateEquipment late_equipment = new LateEquipment();
 
     public StructureRefresh structure_refresh = new StructureRefresh();
@@ -22,6 +24,19 @@ public class GlobalData {
         public boolean enabled = true;
 
         public int scale_within_ticks = 100;
+    }
+
+    public static class RewardCurve {
+        public float scale = 1.0f;
+        public Integer ceiling = null;
+
+        public int apply(int level) {
+            if (level <= 0) {
+                return level;
+            }
+            int curved = Math.max(1, Math.round(level * Math.max(0f, scale)));
+            return ceiling == null ? curved : Math.min(curved, Math.max(0, ceiling));
+        }
     }
 
     public static class ZoneMap {

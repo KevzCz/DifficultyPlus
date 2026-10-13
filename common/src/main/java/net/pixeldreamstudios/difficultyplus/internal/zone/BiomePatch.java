@@ -26,10 +26,10 @@ public final class BiomePatch {
 
     private static final Map<ResourceLocation, Long2LongMap> BY_DIMENSION = new HashMap<>();
 
-    private static int fillsThisTick;
+    private static final Map<ResourceLocation, Integer> FILLS_THIS_TICK = new HashMap<>();
 
     public static void resetTickBudget() {
-        fillsThisTick = 0;
+        FILLS_THIS_TICK.clear();
     }
 
     public static long idAt(ServerLevel level, ChunkPos origin, int cap, int budgetPerTick) {
@@ -44,10 +44,11 @@ public final class BiomePatch {
         if (known != UNRESOLVED) {
             return known;
         }
-        if (budgetPerTick > 0 && fillsThisTick >= budgetPerTick) {
+        int fills = FILLS_THIS_TICK.getOrDefault(dimension, 0);
+        if (budgetPerTick > 0 && fills >= budgetPerTick) {
             return UNRESOLVED;
         }
-        fillsThisTick++;
+        FILLS_THIS_TICK.put(dimension, fills + 1);
         return fill(level, origin, cap, cache);
     }
 

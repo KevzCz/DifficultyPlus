@@ -29,7 +29,7 @@ public final class LevelGap {
         if (!data.enabled) {
             return OptionalInt.empty();
         }
-        OptionalInt raw = PuffishSkills.totalLevel(player, data.categories);
+        OptionalInt raw = PuffishSkills.combinedLevel(player, data.categories, data.modeOrDefault(), data::weightOf);
         if (raw.isEmpty()) {
             return raw;
         }

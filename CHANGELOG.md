@@ -1,1 +1,2 @@
-Added uk_ua translation @Ch1sho
+- Able to add labels that appear below the difficulty
+- Added bias scale to the skulls, reward curve, and level gap modes.

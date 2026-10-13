@@ -44,7 +44,7 @@ public final class ZoneTable {
                 int id = next++;
                 IDS.put(type.name, id);
                 built.add(new ZoneInfo(id, type.name, colourFor(type.name),
-                        resistancesOf(type.name)));
+                        ZoneLabels.labelOf(type.name), resistancesOf(type.name)));
             }
         }
         zones = List.copyOf(built);

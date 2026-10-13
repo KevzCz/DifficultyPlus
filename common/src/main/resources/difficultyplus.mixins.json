@@ -12,6 +12,7 @@
     "client.SocketFlashMixin"
   ],
   "mixins": [
+    "AnnouncementLabelMixin",
     "ChunkSendMixin",
     "ConfigMixin",
     "DifficultyChoiceMixin",
@@ -31,6 +32,7 @@
     "LootTableFillMixin",
     "MarkerSaveMixin",
     "PlayerCastingMixin",
+    "RewardCurveMixin",
     "ServerLevelMixin",
     "StructurePlacementMixin",
     "StructureStartMixin",

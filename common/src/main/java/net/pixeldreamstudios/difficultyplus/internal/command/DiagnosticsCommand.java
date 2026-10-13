@@ -320,6 +320,8 @@ public final class DiagnosticsCommand {
         detail(source, "puffish loaded", String.valueOf(PuffishSkills.isLoaded()));
         detail(source, "categories in config", data.categories.isEmpty()
                 ? "(empty = all)" : String.join(", ", data.categories));
+        detail(source, "mode", data.modeOrDefault().name());
+        detail(source, "player scale", String.valueOf(data.player_scale));
         detail(source, "categories present", PuffishSkills.categoryIds().isEmpty()
                 ? "(none)" : String.join(", ", PuffishSkills.categoryIds()));
 
