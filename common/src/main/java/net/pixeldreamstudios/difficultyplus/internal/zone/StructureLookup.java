@@ -11,18 +11,35 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.pixeldreamstudios.difficultyplus.api.StructureKey;
 
+import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.Optional;
 
 public final class StructureLookup {
+    private static final ThreadLocal<Memo> LAST = new ThreadLocal<>();
+
     private StructureLookup() {}
+
+    private record Memo(WeakReference<ServerLevel> level, long chunk, long time, List<StructureStart> starts) {}
+
+    private static List<StructureStart> startsAt(ServerLevel level, BlockPos pos) {
+        ChunkPos chunk = new ChunkPos(pos);
+        long time = level.getGameTime();
+        Memo memo = LAST.get();
+        if (memo != null && memo.level().get() == level && memo.chunk() == chunk.toLong() && memo.time() == time) {
+            return memo.starts();
+        }
+        List<StructureStart> starts = level.structureManager().startsForStructure(chunk, s -> true);
+        LAST.set(new Memo(new WeakReference<>(level), chunk.toLong(), time, starts));
+        return starts;
+    }
 
     public static Optional<StructureKey> keyAt(ServerLevel level, BlockPos pos, ResourceLocation matchedId) {
         if (matchedId == null) {
             return Optional.empty();
         }
         Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
-        for (StructureStart start : level.structureManager()
-                .startsForStructure(new ChunkPos(pos), s -> true)) {
+        for (StructureStart start : startsAt(level, pos)) {
             if (!start.isValid()) {
                 continue;
             }
@@ -40,8 +57,7 @@ public final class StructureLookup {
 
     public static Optional<StructureKey> enclosing(ServerLevel level, BlockPos pos) {
         Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
-        for (StructureStart start : level.structureManager()
-                .startsForStructure(new ChunkPos(pos), s -> true)) {
+        for (StructureStart start : startsAt(level, pos)) {
             if (!start.isValid()) {
                 continue;
             }
@@ -58,8 +74,7 @@ public final class StructureLookup {
     }
 
     public static Optional<StructureStart> startAt(ServerLevel level, BlockPos pos) {
-        for (StructureStart start : level.structureManager()
-                .startsForStructure(new ChunkPos(pos), s -> true)) {
+        for (StructureStart start : startsAt(level, pos)) {
             if (start.isValid() && start.getBoundingBox().isInside(pos)) {
                 return Optional.of(start);
             }

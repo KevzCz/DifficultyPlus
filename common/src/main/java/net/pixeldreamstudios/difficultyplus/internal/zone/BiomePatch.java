@@ -1,5 +1,7 @@
 package net.pixeldreamstudios.difficultyplus.internal.zone;
 
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
@@ -26,6 +28,8 @@ public final class BiomePatch {
 
     private static final Map<ResourceLocation, Long2LongMap> BY_DIMENSION = new HashMap<>();
 
+    private static final Map<ResourceLocation, Long2IntMap> OVERSIZED = new HashMap<>();
+
     private static final Map<ResourceLocation, Integer> FILLS_THIS_TICK = new HashMap<>();
 
     public static void resetTickBudget() {
@@ -44,15 +48,19 @@ public final class BiomePatch {
         if (known != UNRESOLVED) {
             return known;
         }
+        Long2IntMap oversized = OVERSIZED.computeIfAbsent(dimension, key -> new Long2IntOpenHashMap());
+        if (Math.max(1, cap) <= oversized.get(origin.toLong())) {
+            return UNRESOLVED;
+        }
         int fills = FILLS_THIS_TICK.getOrDefault(dimension, 0);
         if (budgetPerTick > 0 && fills >= budgetPerTick) {
             return UNRESOLVED;
         }
         FILLS_THIS_TICK.put(dimension, fills + 1);
-        return fill(level, origin, cap, cache);
+        return fill(level, origin, cap, cache, oversized);
     }
 
-    private static long fill(ServerLevel level, ChunkPos origin, int cap, Long2LongMap cache) {
+    private static long fill(ServerLevel level, ChunkPos origin, int cap, Long2LongMap cache, Long2IntMap oversized) {
         BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
         Climate.Sampler sampler = level.getChunkSource().randomState().sampler();
 
@@ -103,6 +111,9 @@ public final class BiomePatch {
         }
 
         if (capped) {
+            for (long chunk : matched) {
+                oversized.mergeInt(chunk, limit, Math::max);
+            }
             DifficultyPlus.debug(() -> String.format(
                     "biome fill capped at %d chunks from %s biome=%s",
                     limit, origin, target));
@@ -138,6 +149,7 @@ public final class BiomePatch {
 
     public static void invalidate() {
         BY_DIMENSION.clear();
+        OVERSIZED.clear();
     }
 
     public static boolean isResolved(long id) {

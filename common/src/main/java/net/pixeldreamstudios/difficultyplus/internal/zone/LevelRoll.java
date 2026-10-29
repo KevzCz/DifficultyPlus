@@ -24,9 +24,12 @@ import net.pixeldreamstudios.difficultyplus.config.ZoneData;
 import net.pixeldreamstudios.difficultyplus.DifficultyPlus;
 import net.pixeldreamstudios.difficultyplus.internal.ConfigBridge;
 import net.pixeldreamstudios.difficultyplus.internal.DifficultyPlusInternals;
+import java.lang.ref.WeakReference;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class LevelRoll {
     private LevelRoll() {}
@@ -34,6 +37,10 @@ public final class LevelRoll {
     private static final String ANY = PatternMatching.ANY;
     private static final String TAG_PREFIX = PatternMatching.TAG_PREFIX;
     private static final String NEGATE_PREFIX = PatternMatching.NEGATE_PREFIX;
+    private static final Map<ResourceKey<?>, Map<String, TagKey<?>>> TAGS = new ConcurrentHashMap<>();
+    private static final ThreadLocal<BiomeMemo> LAST_BIOME = new ThreadLocal<>();
+
+    private record BiomeMemo(WeakReference<ServerLevel> level, long pos, long time, ResourceLocation biome) {}
 
     public static boolean isRerollable(ServerLevel level, BlockPos pos,
                                        ResourceLocation matchedId) {
@@ -240,8 +247,8 @@ public final class LevelRoll {
         if (tagId.isEmpty()) {
             return false;
         }
-        ResourceLocation tagLocation = ResourceLocation.tryParse(tagId);
-        if (tagLocation == null) {
+        TagKey<T> tag = tagFor(registryKey, tagId);
+        if (tag == null) {
             return false;
         }
         Registry<T> registry = level.registryAccess().registry(registryKey).orElse(null);
@@ -249,17 +256,43 @@ public final class LevelRoll {
             return false;
         }
         return registry.getHolder(ResourceKey.create(registryKey, id))
-                .map(holder -> holder.is(TagKey.create(registryKey, tagLocation)))
+                .map(holder -> holder.is(tag))
                 .orElse(false);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> TagKey<T> tagFor(ResourceKey<Registry<T>> registryKey, String tagId) {
+        Map<String, TagKey<?>> tags = TAGS.computeIfAbsent(registryKey, k -> new ConcurrentHashMap<>());
+        TagKey<?> cached = tags.get(tagId);
+        if (cached != null) {
+            return (TagKey<T>) cached;
+        }
+        ResourceLocation tagLocation = ResourceLocation.tryParse(tagId);
+        if (tagLocation == null) {
+            return null;
+        }
+        TagKey<T> tag = TagKey.create(registryKey, tagLocation);
+        tags.put(tagId, tag);
+        return tag;
     }
 
     private static boolean biomeMatches(ServerLevel level, BlockPos pos, String pattern) {
         if (pattern == null || pattern.isEmpty()) {
             return false;
         }
+        return patternMatches(level, pattern, biomeIdAt(level, pos), Registries.BIOME);
+    }
+
+    private static ResourceLocation biomeIdAt(ServerLevel level, BlockPos pos) {
+        long time = level.getGameTime();
+        BiomeMemo memo = LAST_BIOME.get();
+        if (memo != null && memo.level().get() == level && memo.pos() == pos.asLong() && memo.time() == time) {
+            return memo.biome();
+        }
         Holder<Biome> biome = level.getBiome(pos);
         ResourceLocation biomeId = biome.unwrapKey().map(ResourceKey::location).orElse(null);
-        return patternMatches(level, pattern, biomeId, Registries.BIOME);
+        LAST_BIOME.set(new BiomeMemo(new WeakReference<>(level), pos.asLong(), time, biomeId));
+        return biomeId;
     }
 
     private static StructureKey regionKey(ServerLevel level, BlockPos pos,

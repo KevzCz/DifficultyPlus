@@ -1,2 +1,3 @@
-- Able to add labels that appear below the difficulty
-- Added bias scale to the skulls, reward curve, and level gap modes.
+- Structure lookups are reused within the same tick instead of being repeated for every check.
+- Biome lookups and biome tag checks are reused within the same tick.
+- Biomes larger than the biome fill size limit are no longer mapped again on every check; the result is now remembered.
