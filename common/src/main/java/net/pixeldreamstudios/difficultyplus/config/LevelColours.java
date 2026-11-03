@@ -11,11 +11,27 @@ public class LevelColours {
 
         public String colour;
 
+        private transient String parsedFrom;
+
+        private transient int parsed;
+
+        private transient boolean ready;
+
         public Stop() {}
 
         public Stop(int level, String colour) {
             this.level = level;
             this.colour = colour;
+        }
+
+        public int rgb() {
+            String current = colour;
+            if (!ready || current != parsedFrom) {
+                parsed = parse(current);
+                parsedFrom = current;
+                ready = true;
+            }
+            return parsed;
         }
     }
 
@@ -41,7 +57,7 @@ public class LevelColours {
                 banded = stop;
             }
         }
-        return parse((banded == null ? stops.get(0) : banded).colour);
+        return (banded == null ? stops.get(0) : banded).rgb();
     }
 
     public static int parse(String colour) {

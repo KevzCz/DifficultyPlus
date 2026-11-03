@@ -1,3 +1,1 @@
-- Structure lookups are reused within the same tick instead of being repeated for every check.
-- Biome lookups and biome tag checks are reused within the same tick.
-- Biomes larger than the biome fill size limit are no longer mapped again on every check; the result is now remembered.
+﻿- Level colours on the Xaero zone map are parsed once instead of for every map pixel.
