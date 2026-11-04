@@ -17,10 +17,7 @@ public abstract class LevelGapDamageMixin {
         if (amount <= 0f) {
             return amount;
         }
-        if (self instanceof ServerPlayer victim) {
-            if (source.getEntity() instanceof LivingEntity mob && !(mob instanceof ServerPlayer)) {
-                return amount * LevelGap.takenMultiplier(victim, mob);
-            }
+        if (self instanceof ServerPlayer) {
             return amount;
         }
         if (source.getEntity() instanceof ServerPlayer attacker) {

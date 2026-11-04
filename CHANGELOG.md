@@ -1,1 +1,1 @@
-﻿- Level colours on the Xaero zone map are parsed once instead of for every map pixel.
+﻿- Fixed the level gap being applied twice to damage players take (once as a multiplier and once as a resistance)
