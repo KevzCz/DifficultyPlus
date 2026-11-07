@@ -30,6 +30,7 @@
     "LivingEntityZoneMixin",
     "LootOriginMixin",
     "LootTableFillMixin",
+    "NaturalSpawnerMixin",
     "MarkerSaveMixin",
     "PlayerCastingMixin",
     "RewardCurveMixin",

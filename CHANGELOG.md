@@ -1,1 +1,3 @@
-﻿- Fixed the level gap being applied twice to damage players take (once as a multiplier and once as a resistance)
+﻿- Fixed a stack overflow crash when teleporting or exploring near structures: zone map lookups no longer run while a chunk is being sent, and they now run in small batches each tick
+- Fixed the same recursion risk when Dungeon Difficulty scales entities that load during a structure lookup: those entities are now scaled on the next tick
+- Added spawn rules: limit naturally spawning mobs to chosen zone levels, by mob id, tag or regex, or by hostile or friendly (Global settings or `difficultyplus.spawn_rules`)

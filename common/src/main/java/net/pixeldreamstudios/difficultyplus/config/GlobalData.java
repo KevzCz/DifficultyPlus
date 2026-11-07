@@ -1,5 +1,6 @@
 package net.pixeldreamstudios.difficultyplus.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GlobalData {
@@ -10,6 +11,8 @@ public class GlobalData {
 
     public int biome_fill_budget = 2;
 
+    public List<SpawnRule> spawn_rules = new ArrayList<>();
+
     public LevelGapData level_gap = new LevelGapData();
 
     public RewardCurve reward_curve = new RewardCurve();
@@ -19,6 +22,16 @@ public class GlobalData {
     public StructureRefresh structure_refresh = new StructureRefresh();
 
     public ZoneMap zone_map = new ZoneMap();
+
+    public static class SpawnRule {
+        public DifficultyPlusData.TargetFilter targets = new DifficultyPlusData.TargetFilter();
+
+        public int min_level = 0;
+
+        public int max_level = 0;
+
+        public boolean allow_outside_zones = true;
+    }
 
     public static class LateEquipment {
         public boolean enabled = true;

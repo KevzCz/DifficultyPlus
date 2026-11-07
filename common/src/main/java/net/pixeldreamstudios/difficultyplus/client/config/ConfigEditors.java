@@ -59,6 +59,11 @@ public final class ConfigEditors {
                         v -> data.resistance_reduction_cap = v),
                 Entries.integer("biome_fill_budget", data.biome_fill_budget,
                         v -> data.biome_fill_budget = v),
+                Entries.objectList("spawn_rules", data.spawn_rules,
+                        v -> data.spawn_rules = v,
+                        GlobalData.SpawnRule::new,
+                        ConfigEditors::labelSpawnRule,
+                        ConfigEditors::spawnRule),
                 Entries.group("zone_map", zoneMap(data.zone_map == null
                         ? data.zone_map = new GlobalData.ZoneMap()
                         : data.zone_map)),
@@ -72,6 +77,21 @@ public final class ConfigEditors {
                         ? data.late_equipment = new GlobalData.LateEquipment()
                         : data.late_equipment)),
                 Entries.group("structure_refresh", structureRefresh(data.structure_refresh)));
+    }
+
+    public static List<AbstractConfigListEntry<?>> spawnRule(GlobalData.SpawnRule value) {
+        return Entries.of(
+                Entries.group("targets", targets(value.targets == null
+                        ? value.targets = new DifficultyPlusData.TargetFilter()
+                        : value.targets)),
+                Entries.integer("min_level", value.min_level, v -> value.min_level = v),
+                Entries.integer("max_level", value.max_level, v -> value.max_level = v),
+                Entries.toggle("allow_outside_zones", value.allow_outside_zones, v -> value.allow_outside_zones = v));
+    }
+
+    private static String labelSpawnRule(GlobalData.SpawnRule value) {
+        String target = value.targets == null || !notEmpty(value.targets.type) ? "(any mob)" : value.targets.type;
+        return target + " " + value.min_level + "+";
     }
 
     public static List<AbstractConfigListEntry<?>> rewardCurve(GlobalData.RewardCurve value) {

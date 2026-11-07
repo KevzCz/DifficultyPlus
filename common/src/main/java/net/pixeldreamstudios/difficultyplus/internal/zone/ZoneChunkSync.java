@@ -3,12 +3,15 @@ package net.pixeldreamstudios.difficultyplus.internal.zone;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -33,8 +36,16 @@ public final class ZoneChunkSync {
 
     private static final Map<UUID, List<Pending>> QUEUE = new HashMap<>();
 
+    private static final Map<UUID, Work> WORK = new HashMap<>();
+
+    private static final long RESOLVE_BUDGET_NANOS = 2_000_000L;
+
+    private static boolean resolving;
+
     private record Pending(long chunk, int zoneId, int level,
                            byte[] quartZones, short[] quartLevels) {}
+
+    private record Work(ResourceKey<Level> dimension, LongLinkedOpenHashSet chunks) {}
 
     public static void onJoin(ServerPlayer player) {
         if (!enabled()) {
@@ -47,12 +58,14 @@ public final class ZoneChunkSync {
     public static void onLeave(ServerPlayer player) {
         SENT.remove(player.getUUID());
         QUEUE.remove(player.getUUID());
+        WORK.remove(player.getUUID());
     }
 
     public static void onConfigReload(Iterable<ServerPlayer> players) {
         ZoneTable.rebuild();
         SENT.clear();
         QUEUE.clear();
+        WORK.clear();
         if (!enabled()) {
             return;
         }
@@ -81,6 +94,42 @@ public final class ZoneChunkSync {
         if (!enabled() || !(player.level() instanceof ServerLevel level)) {
             return;
         }
+        Work work = WORK.get(player.getUUID());
+        if (work == null || work.dimension() != level.dimension()) {
+            work = new Work(level.dimension(), new LongLinkedOpenHashSet());
+            WORK.put(player.getUUID(), work);
+        }
+        work.chunks().add(pos.toLong());
+    }
+
+    private static void resolveWork(ServerLevel level) {
+        if (resolving || WORK.isEmpty()) {
+            return;
+        }
+        resolving = true;
+        try {
+            long deadline = System.nanoTime() + RESOLVE_BUDGET_NANOS;
+            for (ServerPlayer player : level.players()) {
+                Work work = WORK.get(player.getUUID());
+                if (work == null || work.dimension() != level.dimension()) {
+                    continue;
+                }
+                do {
+                    if (work.chunks().isEmpty()) {
+                        break;
+                    }
+                    resolveChunk(player, level, new ChunkPos(work.chunks().removeFirstLong()));
+                } while (System.nanoTime() < deadline);
+                if (work.chunks().isEmpty()) {
+                    WORK.remove(player.getUUID());
+                }
+            }
+        } finally {
+            resolving = false;
+        }
+    }
+
+    private static void resolveChunk(ServerPlayer player, ServerLevel level, ChunkPos pos) {
         int cap = ConfigBridge.global().zone_map.send_distance;
         if (cap > 0) {
             int dx = pos.x - player.chunkPosition().x;
@@ -165,6 +214,7 @@ public final class ZoneChunkSync {
     }
 
     public static void flush(ServerLevel level) {
+        resolveWork(level);
         if (QUEUE.isEmpty()) {
             return;
         }

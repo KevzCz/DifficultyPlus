@@ -7,6 +7,7 @@ import net.pixeldreamstudios.difficultyplus.internal.structure.CastRitual;
 import net.pixeldreamstudios.difficultyplus.internal.structure.RefreshQueue;
 import net.pixeldreamstudios.difficultyplus.internal.structure.SurveyTracker;
 import net.pixeldreamstudios.difficultyplus.internal.zone.BiomePatch;
+import net.pixeldreamstudios.difficultyplus.internal.level.DeferredScaling;
 import net.pixeldreamstudios.difficultyplus.internal.zone.ZoneChunkSync;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,6 +26,7 @@ public abstract class ServerLevelMixin {
         CastRitual.tickCasts((ServerLevel) (Object) this);
         CastRitual.tickFlights((ServerLevel) (Object) this);
         RefreshQueue.tick((ServerLevel) (Object) this);
+        DeferredScaling.drain((ServerLevel) (Object) this);
         ZoneChunkSync.flush((ServerLevel) (Object) this);
     }
 }
