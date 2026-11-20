@@ -38,6 +38,12 @@ public final class DPItems {
                             .stacksTo(16)
                             .rarity(Rarity.RARE), GemKind.GARNET));
 
+    public static final RegistrySupplier<Item> AMETHYST_OF_INHERITANCE =
+            ITEMS.register("amethyst_of_inheritance",
+                    () -> new InheritanceGemItem(new Item.Properties()
+                            .stacksTo(16)
+                            .rarity(Rarity.EPIC)));
+
     public static final RegistrySupplier<Item> SKULL_OF_RENEWAL =
             ITEMS.register("skull_of_renewal",
                     () -> new SocketedSkullItem(new Item.Properties()
@@ -84,7 +90,7 @@ public final class DPItems {
         TABS.register();
 
         CreativeTabRegistry.append(TAB,
-                HOLLOW_SKULL, SAPPHIRE_OF_RENEWAL, GARNET_OF_FATE,
+                HOLLOW_SKULL, SAPPHIRE_OF_RENEWAL, GARNET_OF_FATE, AMETHYST_OF_INHERITANCE,
                 SKULL_OF_RENEWAL, SKULL_OF_FATE);
     }
 }

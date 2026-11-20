@@ -18,6 +18,9 @@
     "client": [
       "net.pixeldreamstudios.difficultyplus.fabric.client.DifficultyPlusFabricClient"
     ],
+    "journeymap": [
+      "net.pixeldreamstudios.difficultyplus.compat.journeymap.DifficultyPlusJourneyMap"
+    ],
     "modmenu": [
       "net.pixeldreamstudios.difficultyplus.fabric.DifficultyPlusModMenu"
     ]

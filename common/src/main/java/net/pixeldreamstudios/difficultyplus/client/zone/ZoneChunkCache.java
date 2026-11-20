@@ -40,6 +40,12 @@ public final class ZoneChunkCache {
         }
     }
 
+    private static final int REGION_SHIFT = 5;
+
+    private static final int REGION_CHUNKS = 1 << REGION_SHIFT;
+
+    private static final int NEIGHBOUR_RING = 1;
+
     private static final Map<ResourceLocation, Long2ObjectMap<Entry>> BY_DIMENSION =
             new HashMap<>();
 
@@ -139,10 +145,11 @@ public final class ZoneChunkCache {
             return 0;
         }
         int hash = 1;
-        int minX = regionX << 5;
-        int minZ = regionZ << 5;
-        for (int x = minX; x < minX + 32; x++) {
-            for (int z = minZ; z < minZ + 32; z++) {
+        int minX = (regionX << REGION_SHIFT) - NEIGHBOUR_RING;
+        int minZ = (regionZ << REGION_SHIFT) - NEIGHBOUR_RING;
+        int span = REGION_CHUNKS + NEIGHBOUR_RING * 2;
+        for (int x = minX; x < minX + span; x++) {
+            for (int z = minZ; z < minZ + span; z++) {
                 Entry entry = map.get(ChunkPos.asLong(x, z));
                 if (entry != null) {
                     hash = hash * 31 + x;
@@ -224,7 +231,11 @@ public final class ZoneChunkCache {
 
     private static void markDirty(long chunk) {
         ChunkPos pos = new ChunkPos(chunk);
-        DIRTY_REGIONS.add(ChunkPos.asLong(pos.x >> 5, pos.z >> 5));
+        for (int offsetZ = -NEIGHBOUR_RING; offsetZ <= NEIGHBOUR_RING; offsetZ++) {
+            for (int offsetX = -NEIGHBOUR_RING; offsetX <= NEIGHBOUR_RING; offsetX++) {
+                DIRTY_REGIONS.add(ChunkPos.asLong((pos.x + offsetX) >> REGION_SHIFT, (pos.z + offsetZ) >> REGION_SHIFT));
+            }
+        }
     }
 
     public static void markAllDirty() {

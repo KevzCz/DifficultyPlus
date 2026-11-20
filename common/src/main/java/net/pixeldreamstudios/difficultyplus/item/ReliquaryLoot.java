@@ -56,6 +56,10 @@ public final class ReliquaryLoot {
                 && random.nextFloat() < config.garnet_chance) {
             drops.add(garnet(random, zoneLevel));
         }
+        if (zoneLevel >= config.amethyst_min_level
+                && random.nextFloat() < config.amethyst_chance) {
+            drops.add(new ItemStack(DPItems.AMETHYST_OF_INHERITANCE.get()));
+        }
         return drops;
     }
 

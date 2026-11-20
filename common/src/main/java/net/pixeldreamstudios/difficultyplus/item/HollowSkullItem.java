@@ -27,7 +27,7 @@ public class HollowSkullItem extends Item {
         if (action != ClickAction.SECONDARY || !slot.allowModification(player)) {
             return false;
         }
-        if (!(other.getItem() instanceof GemItem gem)) {
+        if (!(other.getItem() instanceof GemItem gem) || !gem.kind().socketable()) {
             return false;
         }
 

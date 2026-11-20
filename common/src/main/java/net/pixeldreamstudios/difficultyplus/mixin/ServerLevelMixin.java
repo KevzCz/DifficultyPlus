@@ -1,5 +1,6 @@
 package net.pixeldreamstudios.difficultyplus.mixin;
 
+import net.pixeldreamstudios.difficultyplus.internal.level.PlayerLevelSync;
 import net.minecraft.server.level.ServerLevel;
 import net.pixeldreamstudios.difficultyplus.internal.effect.ZoneEffectManager;
 import net.pixeldreamstudios.difficultyplus.internal.structure.BlockHighlight;
@@ -28,5 +29,6 @@ public abstract class ServerLevelMixin {
         RefreshQueue.tick((ServerLevel) (Object) this);
         DeferredScaling.drain((ServerLevel) (Object) this);
         ZoneChunkSync.flush((ServerLevel) (Object) this);
+        PlayerLevelSync.tick((ServerLevel) (Object) this);
     }
 }

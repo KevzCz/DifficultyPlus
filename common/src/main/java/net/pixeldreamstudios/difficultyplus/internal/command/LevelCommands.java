@@ -51,6 +51,7 @@ public final class LevelCommands {
                                         .executes(context ->
                                                 DiagnosticsCommand.clearCooldown(
                                                         context.getSource())))))
+                .then(ItemLevelCommands.node())
                 .then(Commands.literal("debug").executes(LevelCommands::toggleDebug))
                 .then(Commands.literal("sweepmarkers").executes(LevelCommands::sweepMarkers));
         dispatcher.register(root);

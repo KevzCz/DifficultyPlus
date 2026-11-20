@@ -46,7 +46,7 @@ public final class StructureTargeting {
             if (!start.isValid() || !start.getBoundingBox().isInside(pos)) {
                 continue;
             }
-            if (!nearPiece(start, pos)) {
+            if (!nearPiece(start, pos, PIECE_SLACK)) {
                 continue;
             }
             long volume = volumeOf(start.getBoundingBox());
@@ -67,9 +67,9 @@ public final class StructureTargeting {
         return drift == 0 ? box : box.moved(0, drift, 0);
     }
 
-    private static boolean nearPiece(StructureStart start, BlockPos pos) {
+    public static boolean nearPiece(StructureStart start, BlockPos pos, int slack) {
         for (StructurePiece piece : start.getPieces()) {
-            if (pieceBox(piece).inflatedBy(PIECE_SLACK).isInside(pos)) {
+            if (pieceBox(piece).inflatedBy(slack).isInside(pos)) {
                 return true;
             }
         }

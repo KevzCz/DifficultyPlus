@@ -4,6 +4,7 @@ import net.dungeon_difficulty.config.Config;
 import net.minecraft.util.Mth;
 import net.pixeldreamstudios.difficultyplus.api.DifficultyPlusAPI;
 import net.pixeldreamstudios.difficultyplus.config.DistanceScaling;
+import net.pixeldreamstudios.difficultyplus.config.GlobalData;
 import net.pixeldreamstudios.difficultyplus.config.ZoneData;
 import net.pixeldreamstudios.difficultyplus.internal.ConfigAccess;
 import net.pixeldreamstudios.difficultyplus.internal.ConfigBridge;
@@ -114,6 +115,8 @@ public final class ZoneTable {
 
     private static int computeHash() {
         int hash = 17;
+        GlobalData.StructureZones structureZones = ConfigBridge.global().structure_zones;
+        hash = hash * 31 + (structureZones == null ? 0 : structureZones.hash());
         Config config = ConfigBridge.config();
         if (config != null && config.dimensions != null) {
             for (Config.Dimension dimension : config.dimensions) {

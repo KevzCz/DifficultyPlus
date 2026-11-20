@@ -34,6 +34,8 @@ dependencies {
 
     modLocalRuntime "maven.modrinth:tiny-config:3.0.0-fabric"
 
+    compileOnly("info.journeymap:journeymap-api-common:$rootProject.journeymap_api_version") { transitive = false }
+
     modCompileOnly "com.terraformersmc:modmenu:$rootProject.mod_menu_version"
     modLocalRuntime "com.terraformersmc:modmenu:$rootProject.mod_menu_version"
 

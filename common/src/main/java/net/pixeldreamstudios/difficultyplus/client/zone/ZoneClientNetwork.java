@@ -1,5 +1,6 @@
 package net.pixeldreamstudios.difficultyplus.client.zone;
 
+import net.pixeldreamstudios.difficultyplus.network.PlayerLevelPayload;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
@@ -18,6 +19,10 @@ public final class ZoneClientNetwork {
                     ZoneChunkCache.loadCurrent();
                     ZoneRefresh.requestFullRedraw();
                 }));
+
+        NetworkManager.registerReceiver(NetworkManager.Side.S2C,
+                PlayerLevelPayload.TYPE, PlayerLevelPayload.STREAM_CODEC,
+                (payload, context) -> context.queue(() -> ZoneStyles.playerLevel(payload.level())));
 
         NetworkManager.registerReceiver(NetworkManager.Side.S2C,
                 ZoneChunkPayload.TYPE, ZoneChunkPayload.STREAM_CODEC,

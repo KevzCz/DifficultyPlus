@@ -1,5 +1,6 @@
 package net.pixeldreamstudios.difficultyplus;
 
+import net.pixeldreamstudios.difficultyplus.internal.level.PlayerLevelSync;
 import com.mojang.brigadier.CommandDispatcher;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
@@ -112,6 +113,7 @@ public final class DifficultyPlus {
         DPNetwork.registerServer();
         PlayerEvent.PLAYER_JOIN.register(ZoneChunkSync::onJoin);
         PlayerEvent.PLAYER_QUIT.register(ZoneChunkSync::onLeave);
+        PlayerEvent.PLAYER_QUIT.register(player -> PlayerLevelSync.forget(player.getUUID()));
         DPItems.register();
         ReloadListenerRegistry.register(PackType.SERVER_DATA, new BiasReloadListener(),
                 ResourceLocation.fromNamespaceAndPath(MOD_ID, "biases"));

@@ -5,7 +5,9 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.dungeon_difficulty.config.Config;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.pixeldreamstudios.difficultyplus.client.zone.ZoneChunkCache;
+import net.pixeldreamstudios.difficultyplus.compat.xaero.ZoneColours;
 import net.pixeldreamstudios.difficultyplus.client.zone.ZoneRefresh;
 import net.pixeldreamstudios.difficultyplus.config.ClientData;
 import net.pixeldreamstudios.difficultyplus.config.LevelColours;
@@ -17,6 +19,24 @@ import java.util.List;
 
 public final class DifficultyPlusConfigScreen {
     private DifficultyPlusConfigScreen() {}
+
+    private static final String SHOW_OVERLAY_TIP = "Master switch for drawing zones on both maps. The O key flips this."
+            + " Zone tooltips follow show_tooltips, not this.";
+    private static final String OVERLAY_OPACITY_TIP = "Fades the whole zone overlay on both maps, whatever the style."
+            + " 1 is full strength, 0.3 is faint. Holding O always shows it at full strength.";
+    private static final String BORDER_OPACITY_TIP = "OUTLINE and WASH styles: how solid the line around each zone is.";
+    private static final String STEP_OPACITY_TIP = "OUTLINE and WASH styles: the dashed line where the level crosses"
+            + " 10, 20, 30 inside a zone. 0 hides it.";
+    private static final String WASH_OPACITY_TIP = "WASH style only: the light tint inside each zone.";
+    private static final String FULL_OPACITY_TIP = "FULL style only, also used while holding O: how strong the"
+            + " colour over every chunk is.";
+    private static final String MINIMAP_OVERLAY_TIP = "Draw zones on Xaero's Minimap.";
+    private static final String WORLD_MAP_OVERLAY_TIP = "Draw zones on Xaero's World Map.";
+    private static final String SHOW_TOOLTIPS_TIP = "Show the zone name and level when hovering the map, even when"
+            + " no zones are drawn. Turn both map overlays off and keep this on for tooltips only.";
+    private static final String SMOOTHING_TIP = "Cleans up ragged zone edges on the map: a 4-block cell that is"
+            + " mostly surrounded by another zone is drawn as that zone. 0 is off, 3 is the strongest."
+            + " Tooltips still show the real zone.";
 
     public static Screen create(Screen parent) {
         Config config = ConfigBridge.config();
@@ -64,19 +84,44 @@ public final class DifficultyPlusConfigScreen {
         ClientData client = ClientConfig.get();
         ConfigCategory category = builder.getOrCreateCategory(Component.literal("Map Overlay"));
         category.addEntry(Entries.toggle("show_overlay", client.show_overlay,
-                v -> client.show_overlay = v));
+                v -> client.show_overlay = v, SHOW_OVERLAY_TIP));
+        category.addEntry(Entries.decimal("overlay_opacity", client.overlay_opacity,
+                v -> client.overlay_opacity = Mth.clamp(v, 0f, 1f), OVERLAY_OPACITY_TIP));
+        category.addEntry(Entries.toggle("minimap_overlay", client.minimap_overlay,
+                v -> client.minimap_overlay = v, MINIMAP_OVERLAY_TIP));
+        category.addEntry(Entries.toggle("world_map_overlay", client.world_map_overlay,
+                v -> client.world_map_overlay = v, WORLD_MAP_OVERLAY_TIP));
+        category.addEntry(Entries.toggle("show_tooltips", client.show_tooltips,
+                v -> client.show_tooltips = v, SHOW_TOOLTIPS_TIP));
         category.addEntry(Entries.toggle("show_resistances", client.show_resistances,
                 v -> client.show_resistances = v));
         category.addEntry(Entries.toggle("persist", client.persist, v -> client.persist = v));
-        category.addEntry(Entries.decimal("opacity", client.opacity, v -> client.opacity = v));
+        category.addEntry(Entries.selector("minimap_style", ClientData.OverlayStyle.values(), client.minimapStyle(),
+                v -> client.minimap_style = v));
+        category.addEntry(Entries.selector("world_map_style", ClientData.OverlayStyle.values(), client.worldMapStyle(),
+                v -> client.world_map_style = v));
+        category.addEntry(Entries.selector("colour_mode", ClientData.ColourMode.values(), client.colourMode(), v -> {
+            client.colour_mode = v;
+            client.colour_by_level = v == ClientData.ColourMode.LEVEL;
+        }));
+        category.addEntry(Entries.decimal("border_opacity", client.border_opacity,
+                v -> client.border_opacity = Mth.clamp(v, 0f, 1f), BORDER_OPACITY_TIP));
+        category.addEntry(Entries.decimal("step_opacity", client.step_opacity,
+                v -> client.step_opacity = Mth.clamp(v, 0f, 1f), STEP_OPACITY_TIP));
+        category.addEntry(Entries.decimal("wash_opacity", client.wash_opacity,
+                v -> client.wash_opacity = Mth.clamp(v, 0f, 1f), WASH_OPACITY_TIP));
+        category.addEntry(Entries.decimal("full_style_opacity", client.opacity,
+                v -> client.opacity = Mth.clamp(v, 0f, 1f), FULL_OPACITY_TIP));
         category.addEntry(Entries.toggle("smooth_borders", client.smooth_borders,
                 v -> client.smooth_borders = v,
-                "Fades between neighbouring zone colours instead of stepping at each"
+                "FULL style only: fades between neighbouring zone colours instead of stepping at each"
                         + " 4-block cell. Off gives hard edges."));
-        category.addEntry(Entries.toggle("colour_by_level", client.colour_by_level,
-                v -> client.colour_by_level = v,
-                "Colours the map by level using the ramp below instead of by"
-                        + " difficulty type."));
+        category.addEntry(Entries.integer("smoothing", client.smoothing,
+                v -> client.smoothing = Mth.clamp(v, 0, ZoneColours.MAX_SMOOTHING), SMOOTHING_TIP));
+        category.addEntry(Entries.integer("relative_safe_gap", client.relative_safe_gap, v -> client.relative_safe_gap = v));
+        category.addEntry(Entries.integer("relative_warn_gap", client.relative_warn_gap, v -> client.relative_warn_gap = v));
+        category.addEntry(Entries.integer("relative_danger_gap", client.relative_danger_gap, v -> client.relative_danger_gap = v));
+        category.addEntry(Entries.integer("relative_cleared_gap", client.relative_cleared_gap, v -> client.relative_cleared_gap = v));
         category.addEntry(Entries.objectList("level_colours", client.level_colours,
                 v -> client.level_colours = v,
                 LevelColours.Stop::new,

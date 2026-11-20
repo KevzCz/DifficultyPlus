@@ -14,6 +14,13 @@ public final class DPNetwork {
         }
         NetworkManager.registerS2CPayloadType(ZoneTablePayload.TYPE, ZoneTablePayload.STREAM_CODEC);
         NetworkManager.registerS2CPayloadType(ZoneChunkPayload.TYPE, ZoneChunkPayload.STREAM_CODEC);
+        NetworkManager.registerS2CPayloadType(PlayerLevelPayload.TYPE, PlayerLevelPayload.STREAM_CODEC);
+    }
+
+    public static void send(ServerPlayer player, PlayerLevelPayload payload) {
+        if (NetworkManager.canPlayerReceive(player, PlayerLevelPayload.TYPE)) {
+            NetworkManager.sendToPlayer(player, payload);
+        }
     }
 
     public static void send(ServerPlayer player, ZoneTablePayload payload) {

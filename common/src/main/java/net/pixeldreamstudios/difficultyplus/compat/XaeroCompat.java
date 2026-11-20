@@ -2,6 +2,7 @@ package net.pixeldreamstudios.difficultyplus.compat;
 
 import dev.architectury.platform.Platform;
 import net.pixeldreamstudios.difficultyplus.DifficultyPlus;
+import net.pixeldreamstudios.difficultyplus.compat.xaero.WorldMapOverlayButton;
 import net.pixeldreamstudios.difficultyplus.compat.xaero.XaeroBridge;
 
 public final class XaeroCompat {
@@ -20,6 +21,9 @@ public final class XaeroCompat {
         }
         try {
             XaeroBridge.install();
+            if (worldmap) {
+                WorldMapOverlayButton.register();
+            }
             DifficultyPlus.LOGGER.info("Difficulty+ zone overlay active (minimap={}, worldmap={})",
                     minimap, worldmap);
         } catch (Throwable t) {

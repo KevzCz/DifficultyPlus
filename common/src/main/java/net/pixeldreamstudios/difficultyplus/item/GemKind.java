@@ -2,9 +2,11 @@ package net.pixeldreamstudios.difficultyplus.item;
 
 public enum GemKind {
 
-    SAPPHIRE(0xFF4A8FD4, false),
+    SAPPHIRE(0xFF4A8FD4, false, true),
 
-    GARNET(0xFFC43D3D, true);
+    GARNET(0xFFC43D3D, true, true),
+
+    AMETHYST(0xFF9B59D0, false, false);
 
     public static final int SURVEY_COLOUR = 0xFFFFFFFF;
 
@@ -16,9 +18,16 @@ public enum GemKind {
 
     private final boolean rerolls;
 
-    GemKind(int glowColour, boolean rerolls) {
+    private final boolean socketable;
+
+    GemKind(int glowColour, boolean rerolls, boolean socketable) {
         this.glowColour = glowColour;
         this.rerolls = rerolls;
+        this.socketable = socketable;
+    }
+
+    public boolean socketable() {
+        return socketable;
     }
 
     public int glowColour() {

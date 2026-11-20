@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.pixeldreamstudios.difficultyplus.client.zone.ZoneChunkCache;
+import net.pixeldreamstudios.difficultyplus.client.zone.ZoneStyles;
 import net.pixeldreamstudios.difficultyplus.compat.ZoneTooltips;
 import net.pixeldreamstudios.difficultyplus.internal.ClientConfig;
 import xaero.common.minimap.highlight.ChunkHighlighter;
@@ -15,7 +16,9 @@ import java.util.List;
 
 public final class MinimapZoneHighlighter extends ChunkHighlighter {
 
-    private final int[] quartStore = new int[16];
+    private static final ZoneStyles.Map MAP = ZoneStyles.Map.MINIMAP;
+
+    private final ZoneColours.Scratch scratch = new ZoneColours.Scratch();
 
     public MinimapZoneHighlighter() {
         super(false);
@@ -23,29 +26,25 @@ public final class MinimapZoneHighlighter extends ChunkHighlighter {
 
     @Override
     public boolean regionHasHighlights(ResourceKey<Level> dimension, int regionX, int regionZ) {
-        return enabled() && ZoneChunkCache.regionHasEntries(id(dimension), regionX, regionZ);
+        return ZoneStyles.active(MAP) && ZoneChunkCache.regionHasEntries(id(dimension), regionX, regionZ);
     }
 
     @Override
     public boolean chunkIsHighlit(ResourceKey<Level> dimension, int chunkX, int chunkZ) {
-        return enabled()
+        return ZoneStyles.active(MAP)
                 && ZoneChunkCache.get(id(dimension), ChunkPos.asLong(chunkX, chunkZ)) != null;
     }
 
     @Override
     protected int[] getColors(ResourceKey<Level> dimension, int chunkX, int chunkZ) {
-        return ZoneColours.colourFor(id(dimension), chunkX, chunkZ, resultStore);
+        return null;
     }
 
     @Override
     public int[] getChunkHighlitColor(ResourceKey<Level> dimension, int chunkX, int chunkZ) {
-        if (!enabled()) {
-            return super.getChunkHighlitColor(dimension, chunkX, chunkZ);
-        }
-        if (!ZoneColours.fillQuarts(id(dimension), chunkX, chunkZ, quartStore, this::setResult)) {
-            return super.getChunkHighlitColor(dimension, chunkX, chunkZ);
-        }
-        return resultStore;
+        return ZoneStyles.drawn(MAP) && ZoneColours.fillQuarts(id(dimension), chunkX, chunkZ, scratch, this::setResult, MAP)
+                ? resultStore
+                : null;
     }
 
     @Override
@@ -65,7 +64,7 @@ public final class MinimapZoneHighlighter extends ChunkHighlighter {
 
     private void emit(InfoDisplayCompiler compiler, ResourceKey<Level> dimension,
                       long chunk, int quart) {
-        if (!enabled()) {
+        if (!ZoneStyles.tooltips()) {
             return;
         }
         List<Component> lines = ZoneTooltips.lines(id(dimension), chunk, quart,
@@ -73,10 +72,6 @@ public final class MinimapZoneHighlighter extends ChunkHighlighter {
         for (Component line : lines) {
             compiler.addLine(line);
         }
-    }
-
-    private static boolean enabled() {
-        return ClientConfig.get().show_overlay;
     }
 
     private static ResourceLocation id(ResourceKey<Level> dimension) {

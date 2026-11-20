@@ -6,7 +6,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.pixeldreamstudios.difficultyplus.api.StructureKey;
@@ -47,9 +46,8 @@ public final class StructureLookup {
             if (id == null || !id.equals(matchedId)) {
                 continue;
             }
-            BoundingBox box = start.getBoundingBox();
-            if (box.isInside(pos)) {
-                return Optional.of(StructureKey.of(id, box.getCenter()));
+            if (StructureContainment.contains(start, pos)) {
+                return Optional.of(StructureKey.of(id, start.getBoundingBox().getCenter()));
             }
         }
         return Optional.empty();
@@ -58,16 +56,12 @@ public final class StructureLookup {
     public static Optional<StructureKey> enclosing(ServerLevel level, BlockPos pos) {
         Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
         for (StructureStart start : startsAt(level, pos)) {
-            if (!start.isValid()) {
-                continue;
-            }
-            BoundingBox box = start.getBoundingBox();
-            if (!box.isInside(pos)) {
+            if (!StructureContainment.contains(start, pos)) {
                 continue;
             }
             ResourceLocation id = registry.getKey(start.getStructure());
             if (id != null) {
-                return Optional.of(StructureKey.of(id, box.getCenter()));
+                return Optional.of(StructureKey.of(id, start.getBoundingBox().getCenter()));
             }
         }
         return Optional.empty();
@@ -75,7 +69,7 @@ public final class StructureLookup {
 
     public static Optional<StructureStart> startAt(ServerLevel level, BlockPos pos) {
         for (StructureStart start : startsAt(level, pos)) {
-            if (start.isValid() && start.getBoundingBox().isInside(pos)) {
+            if (StructureContainment.contains(start, pos)) {
                 return Optional.of(start);
             }
         }

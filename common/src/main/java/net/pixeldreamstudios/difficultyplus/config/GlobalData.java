@@ -23,6 +23,8 @@ public class GlobalData {
 
     public ZoneMap zone_map = new ZoneMap();
 
+    public StructureZones structure_zones = new StructureZones();
+
     public static class SpawnRule {
         public DifficultyPlusData.TargetFilter targets = new DifficultyPlusData.TargetFilter();
 
@@ -60,6 +62,16 @@ public class GlobalData {
         public boolean quart_detail = true;
     }
 
+    public static class StructureZones {
+        public boolean pieces_only = true;
+
+        public int piece_margin = 3;
+
+        public int hash() {
+            return (pieces_only ? 1 : 0) * 31 + piece_margin;
+        }
+    }
+
     public static class StructureRefresh {
         public boolean enabled = true;
 
@@ -89,6 +101,10 @@ public class GlobalData {
         public float garnet_chance = 0.01f;
 
         public int garnet_min_level = 3;
+
+        public float amethyst_chance = 0.02f;
+
+        public int amethyst_min_level = 3;
 
         public List<String> key_blocks = List.of(
                 "minecraft:chest",

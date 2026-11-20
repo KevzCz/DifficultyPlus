@@ -42,6 +42,8 @@ dependencies {
     modCompileOnly("curse.maven:xaeros-minimap-263420:$rootProject.xaero_minimap_neoforge") { transitive = false }
     modCompileOnly("curse.maven:xaeros-world-map-317780:$rootProject.xaero_worldmap_neoforge") { transitive = false }
 
+    compileOnly("info.journeymap:journeymap-api-neoforge:$rootProject.journeymap_api_version") { transitive = false }
+
     modCompileOnly "me.shedaniel.cloth:cloth-config-neoforge:$rootProject.cloth_config_version"
     modLocalRuntime "me.shedaniel.cloth:cloth-config-neoforge:$rootProject.cloth_config_version"
 

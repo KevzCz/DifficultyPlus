@@ -98,6 +98,9 @@ explicitly pinned — the same rule Dungeon Difficulty uses. A zone written as
 /difficultyplus level set <n>    # pin the structure you are standing in
 /difficultyplus level reroll     # new roll for that structure
 /difficultyplus level clear      # drop the override, back to the base roll
+/difficultyplus item level <n> [players]   # give the held item that Dungeon Difficulty level
+/difficultyplus item clear [players]       # remove the held item's level
+/difficultyplus item query                 # show the held item's level
 ```
 
 ### Zone label — on a difficulty type

@@ -71,6 +71,15 @@ public final class Entries {
                 .build();
     }
 
+    public static AbstractConfigListEntry<?> integer(String label, int value,
+                                                     Consumer<Integer> setter, String tooltip) {
+        return builder().startIntField(text(label), value)
+                .setDefaultValue(0)
+                .setTooltip(text(tooltip))
+                .setSaveConsumer(setter)
+                .build();
+    }
+
     public static AbstractConfigListEntry<?> decimal(String label, float value,
                                                      Consumer<Float> setter, String tooltip) {
         return builder().startFloatField(text(label), value)

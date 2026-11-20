@@ -21,6 +21,12 @@ import java.util.List;
 public final class ConfigEditors {
     private ConfigEditors() {}
 
+    private static final String PIECES_ONLY_TIP = "A spot only counts as inside a structure when it is in one of the"
+            + " structure's rooms or corridors, not anywhere in its overall outline. Stops underground dungeons"
+            + " from claiming the surface above them. Off uses the whole outline, as Dungeon Difficulty does.";
+    private static final String PIECE_MARGIN_TIP = "How many blocks around each room or corridor still count as"
+            + " inside the structure when pieces_only is on.";
+
     public static List<AbstractConfigListEntry<?>> meta(Config.Meta meta) {
         return Entries.of(
                 Entries.toggle("sanitize_config", meta.sanitize_config,
@@ -67,6 +73,9 @@ public final class ConfigEditors {
                 Entries.group("zone_map", zoneMap(data.zone_map == null
                         ? data.zone_map = new GlobalData.ZoneMap()
                         : data.zone_map)),
+                Entries.group("structure_zones", structureZones(data.structure_zones == null
+                        ? data.structure_zones = new GlobalData.StructureZones()
+                        : data.structure_zones)),
                 Entries.group("reward_curve", rewardCurve(data.reward_curve == null
                         ? data.reward_curve = new GlobalData.RewardCurve()
                         : data.reward_curve)),
@@ -169,6 +178,14 @@ public final class ConfigEditors {
                                 + " follow biome edges. Costs more sampling at boundaries."));
     }
 
+    public static List<AbstractConfigListEntry<?>> structureZones(GlobalData.StructureZones value) {
+        return Entries.of(
+                Entries.toggle("pieces_only", value.pieces_only,
+                        v -> value.pieces_only = v, PIECES_ONLY_TIP),
+                Entries.integer("piece_margin", value.piece_margin,
+                        v -> value.piece_margin = Math.max(0, v), PIECE_MARGIN_TIP));
+    }
+
     public static List<AbstractConfigListEntry<?>> structureRefresh(
             GlobalData.StructureRefresh value) {
         return Entries.of(
@@ -196,7 +213,11 @@ public final class ConfigEditors {
                         Entries.decimal("garnet_chance", value.garnet_chance,
                                 v -> value.garnet_chance = v),
                         Entries.integer("garnet_min_level", value.garnet_min_level,
-                                v -> value.garnet_min_level = v))));
+                                v -> value.garnet_min_level = v),
+                        Entries.decimal("amethyst_chance", value.amethyst_chance,
+                                v -> value.amethyst_chance = v),
+                        Entries.integer("amethyst_min_level", value.amethyst_min_level,
+                                v -> value.amethyst_min_level = v))));
     }
 
     public static List<AbstractConfigListEntry<?>> difficultyType(Config.DifficultyType type) {

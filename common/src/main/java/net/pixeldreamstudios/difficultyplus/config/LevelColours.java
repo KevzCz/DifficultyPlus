@@ -37,13 +37,19 @@ public class LevelColours {
 
     public static List<Stop> defaults() {
         List<Stop> out = new ArrayList<>();
-        out.add(new Stop(1, "#2ECC71"));
-        out.add(new Stop(6, "#3498DB"));
-        out.add(new Stop(11, "#F1C40F"));
-        out.add(new Stop(16, "#E67E22"));
-        out.add(new Stop(21, "#E74C3C"));
-        out.add(new Stop(26, "#9B59B6"));
-        out.add(new Stop(31, "#ECF0F1"));
+        out.add(new Stop(0, "#A9BCC6"));
+        out.add(new Stop(10, "#86ADD0"));
+        out.add(new Stop(20, "#5F92D0"));
+        out.add(new Stop(30, "#4A6FC2"));
+        out.add(new Stop(40, "#D6B24C"));
+        out.add(new Stop(50, "#DB8B45"));
+        out.add(new Stop(60, "#D2643F"));
+        out.add(new Stop(70, "#BE3F3F"));
+        out.add(new Stop(80, "#A23466"));
+        out.add(new Stop(90, "#7E3A9C"));
+        out.add(new Stop(100, "#6544A8"));
+        out.add(new Stop(110, "#4F3C93"));
+        out.add(new Stop(120, "#3F2F7A"));
         return out;
     }
 
