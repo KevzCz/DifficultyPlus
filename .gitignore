@@ -48,3 +48,4 @@ replay_*.log
 classes/
 bin/
 *.launch
+docs/page/

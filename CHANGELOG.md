@@ -1,5 +1,1 @@
-- More overlay improvements
-- JourneyMap Compat
-- Added new buttons to Xaero
-- Added the Amethyst of Inheritance (Inherit an item's level to put on another item)
-- Added /difficultyplus item (for non-loot level items)
+- Summons/Entities now spawn at their owner's level instead of the zone's (level_gap.owned_mobs)

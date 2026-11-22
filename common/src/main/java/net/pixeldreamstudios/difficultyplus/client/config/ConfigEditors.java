@@ -26,6 +26,10 @@ public final class ConfigEditors {
             + " from claiming the surface above them. Off uses the whole outline, as Dungeon Difficulty does.";
     private static final String PIECE_MARGIN_TIP = "How many blocks around each room or corridor still count as"
             + " inside the structure when pieces_only is on.";
+    private static final String OWNED_MOBS_TIP = "Mobs a player owns, like summons and pets, spawn at their owner's level instead of the"
+            + " zone's, so they grow with their owner rather than with where they were summoned. Only works while"
+            + " level_gap is on and the owner has a skill level. Mobs that were already scaled before they got an"
+            + " owner, like animals tamed later, keep their level.";
 
     public static List<AbstractConfigListEntry<?>> meta(Config.Meta meta) {
         return Entries.of(
@@ -134,7 +138,18 @@ public final class ConfigEditors {
                         : value.player_above)),
                 Entries.group("mob_vs_mob", mobVsMob(value.mob_vs_mob == null
                         ? value.mob_vs_mob = new LevelGapData.MobVsMob()
-                        : value.mob_vs_mob)));
+                        : value.mob_vs_mob)),
+                Entries.group("owned_mobs", ownedMobs(value.owned_mobs == null
+                        ? value.owned_mobs = new LevelGapData.OwnedMobs()
+                        : value.owned_mobs)));
+    }
+
+    public static List<AbstractConfigListEntry<?>> ownedMobs(LevelGapData.OwnedMobs value) {
+        return Entries.of(
+                Entries.toggle("enabled", value.enabled, v -> value.enabled = v, OWNED_MOBS_TIP),
+                Entries.group("targets", targets(value.targets == null
+                        ? value.targets = new DifficultyPlusData.TargetFilter()
+                        : value.targets)));
     }
 
     public static List<AbstractConfigListEntry<?>> mobVsMob(LevelGapData.MobVsMob value) {

@@ -49,6 +49,15 @@ public class LevelGapData {
 
     public MobVsMob mob_vs_mob = new MobVsMob();
 
+    public OwnedMobs owned_mobs = new OwnedMobs();
+
+    public static class OwnedMobs {
+
+        public boolean enabled = true;
+
+        public DifficultyPlusData.TargetFilter targets = new DifficultyPlusData.TargetFilter();
+    }
+
     public static class MobVsMob {
 
         public boolean enabled = false;

@@ -5,6 +5,7 @@ import net.dungeon_difficulty.logic.PatternMatching;
 import net.dungeon_difficulty.logic.ScalingGoal;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.pixeldreamstudios.difficultyplus.internal.level.OwnedMobLevels;
 import net.pixeldreamstudios.difficultyplus.internal.zone.RolledLevel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,7 +33,7 @@ public class DifficultyResultMixin {
             return;
         }
 
-        Difficulty rolled = RolledLevel.apply(level, location, result, difficulty);
+        Difficulty rolled = OwnedMobLevels.match(RolledLevel.apply(level, location, result, difficulty));
         if (rolled != difficulty) {
             cir.setReturnValue(new PatternMatching.DifficultySearchResult(
                     rolled, result.locationData(), result.match()));

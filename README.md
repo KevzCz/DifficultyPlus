@@ -49,6 +49,8 @@ Dungeon Difficulty, exactly as `/dungeon_difficulty_config_reload` does.
 | `reward_curve.ceiling` | Optional cap on that level, so loot stops growing past it. The item still records its real level. |
 | `level_gap.mode` | How the listed Puffish categories combine into the player's level: `SUM` (default), `HIGHEST` or `AVERAGE`. |
 | `level_gap.weights` | Optional `[{ "category": "ns:id", "weight": 0.5 }]`. A category's level is multiplied by its weight; `0` ignores it. Unlisted categories weigh `1.0`. |
+| `level_gap.owned_mobs.enabled` | Mobs a player owns, like summons and pets, spawn at their owner's level instead of the zone's, in harder and easier zones alike. Only works while `level_gap` is on and the owner has a level from the listed categories; otherwise they scale with the zone as before. Mobs scaled before they had an owner, like animals tamed later, keep their level. Default `true`. |
+| `level_gap.owned_mobs.targets` | Which owned mobs it applies to. `{ "attitude": "ANY", "type": "" }` matches all of them; `type` takes an entity id, a `#tag` or a regex, and `!` excludes. |
 
 On a dimension, `"difficultyplus": { "biome_fill_budget": 4 }` gives that dimension its own budget.
 
