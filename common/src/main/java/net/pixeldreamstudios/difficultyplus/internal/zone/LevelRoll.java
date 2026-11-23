@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 public final class LevelRoll {
     private LevelRoll() {}
@@ -39,6 +40,8 @@ public final class LevelRoll {
     private static final String NEGATE_PREFIX = PatternMatching.NEGATE_PREFIX;
     private static final Map<ResourceKey<?>, Map<String, TagKey<?>>> TAGS = new ConcurrentHashMap<>();
     private static final ThreadLocal<BiomeMemo> LAST_BIOME = new ThreadLocal<>();
+    private static final Map<Config.Zone, Map<ResourceLocation, Boolean>> ID_MENTIONS = new ConcurrentHashMap<>();
+    private static final Map<Config.Zone, Map<ResourceLocation, Boolean>> BIOME_MENTIONS = new ConcurrentHashMap<>();
 
     private record BiomeMemo(WeakReference<ServerLevel> level, long pos, long time, ResourceLocation biome) {}
 
@@ -213,10 +216,27 @@ public final class LevelRoll {
         if (zone.zone_matches == null) {
             return false;
         }
-        return patternMatches(level, zone.zone_matches.structure, matchedId, Registries.STRUCTURE)
-                || patternMatches(level, zone.zone_matches.biome, matchedId, Registries.BIOME)
+        if (matchedId != null && mentions(ID_MENTIONS, zone, matchedId,
+                id -> patternMatches(level, zone.zone_matches.structure, id, Registries.STRUCTURE)
+                        || patternMatches(level, zone.zone_matches.biome, id, Registries.BIOME))) {
+            return true;
+        }
+        String biomePattern = zone.zone_matches.biome;
+        if (biomePattern == null || biomePattern.isEmpty()) {
+            return false;
+        }
+        ResourceLocation biome = biomeIdAt(level, pos);
+        return biome != null && mentions(BIOME_MENTIONS, zone, biome, id -> patternMatches(level, biomePattern, id, Registries.BIOME));
+    }
 
-                || biomeMatches(level, pos, zone.zone_matches.biome);
+    private static boolean mentions(Map<Config.Zone, Map<ResourceLocation, Boolean>> cache, Config.Zone zone, ResourceLocation id,
+                                    Predicate<ResourceLocation> test) {
+        return cache.computeIfAbsent(zone, key -> new ConcurrentHashMap<>()).computeIfAbsent(id, test::test);
+    }
+
+    public static void invalidate() {
+        ID_MENTIONS.clear();
+        BIOME_MENTIONS.clear();
     }
 
     private static <T> boolean patternMatches(ServerLevel level,
@@ -274,13 +294,6 @@ public final class LevelRoll {
         TagKey<T> tag = TagKey.create(registryKey, tagLocation);
         tags.put(tagId, tag);
         return tag;
-    }
-
-    private static boolean biomeMatches(ServerLevel level, BlockPos pos, String pattern) {
-        if (pattern == null || pattern.isEmpty()) {
-            return false;
-        }
-        return patternMatches(level, pattern, biomeIdAt(level, pos), Registries.BIOME);
     }
 
     private static ResourceLocation biomeIdAt(ServerLevel level, BlockPos pos) {

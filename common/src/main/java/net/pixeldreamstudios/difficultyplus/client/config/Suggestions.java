@@ -1,5 +1,6 @@
 package net.pixeldreamstudios.difficultyplus.client.config;
 
+import net.dungeon_difficulty.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.server.IntegratedServer;
@@ -9,11 +10,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.pixeldreamstudios.difficultyplus.DifficultyPlus;
+import net.pixeldreamstudios.difficultyplus.internal.ConfigBridge;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public final class Suggestions {
     private Suggestions() {}
@@ -64,6 +67,14 @@ public final class Suggestions {
 
     public static List<String> dimensions() {
         return dynamic(Registries.LEVEL_STEM, false);
+    }
+
+    public static List<String> difficultyTypes() {
+        Config config = ConfigBridge.config();
+        if (config == null || config.difficulty_types == null) {
+            return List.of();
+        }
+        return config.difficulty_types.stream().map(type -> type.name).filter(Objects::nonNull).toList();
     }
 
     private static <T> List<String> dynamic(ResourceKey<? extends Registry<T>> key, boolean tags) {

@@ -11,6 +11,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.pixeldreamstudios.difficultyplus.DifficultyPlus;
 
@@ -24,6 +25,11 @@ public final class DifficultyPlusNeoForge {
                 event -> DifficultyPlus.registerCommands(event.getDispatcher()));
         NeoForge.EVENT_BUS.addListener(ServerStartedEvent.class,
                 event -> DifficultyPlus.onServerStarted(event.getServer()));
+        NeoForge.EVENT_BUS.addListener(TagsUpdatedEvent.class, event -> {
+            if (event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) {
+                DifficultyPlus.onDataReloaded();
+            }
+        });
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             DifficultyPlusClient.init();

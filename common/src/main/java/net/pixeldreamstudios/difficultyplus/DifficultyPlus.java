@@ -1,5 +1,6 @@
 package net.pixeldreamstudios.difficultyplus;
 
+import net.pixeldreamstudios.difficultyplus.internal.zone.ZoneResolver;
 import net.pixeldreamstudios.difficultyplus.internal.level.PlayerLevelSync;
 import com.mojang.brigadier.CommandDispatcher;
 import dev.architectury.event.events.common.LifecycleEvent;
@@ -117,6 +118,10 @@ public final class DifficultyPlus {
         DPItems.register();
         ReloadListenerRegistry.register(PackType.SERVER_DATA, new BiasReloadListener(),
                 ResourceLocation.fromNamespaceAndPath(MOD_ID, "biases"));
+    }
+
+    public static void onDataReloaded() {
+        ZoneResolver.invalidate();
     }
 
     public static void onServerStarted(MinecraftServer startedServer) {

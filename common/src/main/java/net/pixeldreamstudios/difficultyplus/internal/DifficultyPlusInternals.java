@@ -6,6 +6,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.pixeldreamstudios.difficultyplus.api.DifficultyPlusAPI;
 import net.pixeldreamstudios.difficultyplus.api.LevelResolver;
+import net.pixeldreamstudios.difficultyplus.api.OwnedLevelSource;
 import net.pixeldreamstudios.difficultyplus.api.ResistanceProvider;
 import net.pixeldreamstudios.difficultyplus.api.StructureKey;
 import net.pixeldreamstudios.difficultyplus.api.ZoneContext;
@@ -26,6 +27,7 @@ public final class DifficultyPlusInternals {
 
     private static final List<LevelResolver> LEVEL_RESOLVERS = new ArrayList<>();
     private static final List<ResistanceProvider> RESISTANCE_PROVIDERS = new ArrayList<>();
+    private static final List<OwnedLevelSource> OWNED_LEVEL_SOURCES = new ArrayList<>();
 
     public static void registerLevelResolver(LevelResolver resolver) {
         LEVEL_RESOLVERS.add(resolver);
@@ -38,6 +40,14 @@ public final class DifficultyPlusInternals {
 
     public static void registerResistanceProvider(ResistanceProvider provider) {
         RESISTANCE_PROVIDERS.add(provider);
+    }
+
+    public static void registerOwnedLevelSource(OwnedLevelSource source) {
+        OWNED_LEVEL_SOURCES.add(source);
+    }
+
+    public static List<OwnedLevelSource> ownedLevelSources() {
+        return OWNED_LEVEL_SOURCES;
     }
 
     public static List<ResistanceProvider> resistanceProviders() {

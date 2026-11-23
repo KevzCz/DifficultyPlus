@@ -33,7 +33,12 @@ public class DifficultyResultMixin {
             return;
         }
 
-        Difficulty rolled = OwnedMobLevels.match(RolledLevel.apply(level, location, result, difficulty));
+        PatternMatching.DifficultySearchResult summoned = OwnedMobLevels.summon(level, result);
+        if (summoned != null) {
+            cir.setReturnValue(summoned);
+            return;
+        }
+        Difficulty rolled = RolledLevel.apply(level, location, result, difficulty);
         if (rolled != difficulty) {
             cir.setReturnValue(new PatternMatching.DifficultySearchResult(
                     rolled, result.locationData(), result.match()));

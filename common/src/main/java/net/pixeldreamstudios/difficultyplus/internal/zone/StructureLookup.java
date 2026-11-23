@@ -10,6 +10,8 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.pixeldreamstudios.difficultyplus.api.StructureKey;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Optional;
@@ -19,17 +21,21 @@ public final class StructureLookup {
 
     private StructureLookup() {}
 
-    private record Memo(WeakReference<ServerLevel> level, long chunk, long time, List<StructureStart> starts) {}
+    private record Memo(WeakReference<ServerLevel> level, long time, Long2ObjectMap<List<StructureStart>> chunks) {}
 
     private static List<StructureStart> startsAt(ServerLevel level, BlockPos pos) {
         ChunkPos chunk = new ChunkPos(pos);
         long time = level.getGameTime();
         Memo memo = LAST.get();
-        if (memo != null && memo.level().get() == level && memo.chunk() == chunk.toLong() && memo.time() == time) {
-            return memo.starts();
+        if (memo == null || memo.level().get() != level || memo.time() != time) {
+            memo = new Memo(new WeakReference<>(level), time, new Long2ObjectOpenHashMap<>());
+            LAST.set(memo);
         }
-        List<StructureStart> starts = level.structureManager().startsForStructure(chunk, s -> true);
-        LAST.set(new Memo(new WeakReference<>(level), chunk.toLong(), time, starts));
+        List<StructureStart> starts = memo.chunks().get(chunk.toLong());
+        if (starts == null) {
+            starts = level.structureManager().startsForStructure(chunk, s -> true);
+            memo.chunks().put(chunk.toLong(), starts);
+        }
         return starts;
     }
 

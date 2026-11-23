@@ -11,6 +11,7 @@ public final class DifficultyPlusFabric implements ModInitializer {
         DifficultyPlus.init();
 
         ServerLifecycleEvents.SERVER_STARTED.register(DifficultyPlus::onServerStarted);
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resources, success) -> DifficultyPlus.onDataReloaded());
         CommandRegistrationCallback.EVENT.register(
                 (dispatcher, registry, environment) -> DifficultyPlus.registerCommands(dispatcher));
     }

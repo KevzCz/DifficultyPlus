@@ -56,6 +56,8 @@ public class LevelGapData {
         public boolean enabled = true;
 
         public DifficultyPlusData.TargetFilter targets = new DifficultyPlusData.TargetFilter();
+
+        public String difficulty = "";
     }
 
     public static class MobVsMob {

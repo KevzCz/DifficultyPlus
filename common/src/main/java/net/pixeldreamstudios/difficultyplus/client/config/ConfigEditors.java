@@ -31,6 +31,9 @@ public final class ConfigEditors {
             + " level_gap is on and the owner has a skill level. Mobs that were already scaled before they got an"
             + " owner, like animals tamed later, keep their level.";
 
+    private static final String OWNED_MOBS_DIFFICULTY_TIP = "Difficulty type summons scale with, wherever they were summoned. Leave empty to use the"
+            + " dimension's own difficulty type, so zones and structures no longer change a summon's stats.";
+
     public static List<AbstractConfigListEntry<?>> meta(Config.Meta meta) {
         return Entries.of(
                 Entries.toggle("sanitize_config", meta.sanitize_config,
@@ -147,6 +150,7 @@ public final class ConfigEditors {
     public static List<AbstractConfigListEntry<?>> ownedMobs(LevelGapData.OwnedMobs value) {
         return Entries.of(
                 Entries.toggle("enabled", value.enabled, v -> value.enabled = v, OWNED_MOBS_TIP),
+                Entries.searchable("difficulty", Suggestions::difficultyTypes, value.difficulty, v -> value.difficulty = v, OWNED_MOBS_DIFFICULTY_TIP),
                 Entries.group("targets", targets(value.targets == null
                         ? value.targets = new DifficultyPlusData.TargetFilter()
                         : value.targets)));

@@ -1,1 +1,6 @@
-- Summons/Entities now spawn at their owner's level instead of the zone's (level_gap.owned_mobs)
+- Summons use level_gap.owned_mobs.difficulty as their difficulty type, or the dimension's type if that's empty, so summoning inside a zone doesn't change their stats anymore. Tamed animals keep the level they had before taming
+- Vexes and other mobs with a vanilla owner count as owned mobs too
+- Zone lookups are cheaper (zone matches are cached, structure lookups are reused within the same tick)
+- Fixed lag spikes from zone map syncing when a lot of chunks load at once
+- Fixed the zone cache never clearing during a session
+- Added an API for other mods to set the level of their summons.

@@ -114,12 +114,9 @@ public final class ZoneChunkSync {
                 if (work == null || work.dimension() != level.dimension()) {
                     continue;
                 }
-                do {
-                    if (work.chunks().isEmpty()) {
-                        break;
-                    }
+                while (!work.chunks().isEmpty() && System.nanoTime() < deadline) {
                     resolveChunk(player, level, new ChunkPos(work.chunks().removeFirstLong()));
-                } while (System.nanoTime() < deadline);
+                }
                 if (work.chunks().isEmpty()) {
                     WORK.remove(player.getUUID());
                 }

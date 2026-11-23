@@ -23,6 +23,10 @@ public final class ZoneResolver {
 
     private static final long TTL_TICKS = 20L;
 
+    private static final long PRUNE_INTERVAL_TICKS = 200L;
+
+    private static long lastPrune;
+
     private record Entry(Optional<ZoneContext> value, long tick) {}
 
     public static Optional<ZoneContext> at(ServerLevel level, BlockPos pos) {
@@ -33,6 +37,10 @@ public final class ZoneResolver {
                 level.getBiome(pos).unwrapKey().map(ResourceKey::location).orElse(null));
 
         long now = level.getGameTime();
+        if (now - lastPrune >= PRUNE_INTERVAL_TICKS || now < lastPrune) {
+            lastPrune = now;
+            CACHE.values().forEach(entries -> entries.values().removeIf(entry -> now - entry.tick() >= TTL_TICKS));
+        }
         Map<CacheKey, Entry> byKey = CACHE.computeIfAbsent(dimension, k -> new HashMap<>());
         Entry cached = byKey.get(key);
         if (cached != null && now - cached.tick() < TTL_TICKS) {
@@ -72,5 +80,6 @@ public final class ZoneResolver {
 
     public static void invalidate() {
         CACHE.clear();
+        LevelRoll.invalidate();
     }
 }

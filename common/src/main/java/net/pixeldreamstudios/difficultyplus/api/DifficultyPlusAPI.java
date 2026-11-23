@@ -33,6 +33,10 @@ public final class DifficultyPlusAPI {
         DifficultyPlusInternals.registerResistanceProvider(provider);
     }
 
+    public static void registerOwnedLevelSource(OwnedLevelSource source) {
+        DifficultyPlusInternals.registerOwnedLevelSource(source);
+    }
+
     public static OptionalInt levelAt(ServerLevel level, BlockPos pos) {
         return DifficultyPlusInternals.levelAt(level, pos);
     }
