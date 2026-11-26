@@ -25,6 +25,15 @@ public final class ReloadHandler {
     }
 
     public static void afterConfigReload() {
+        MinecraftServer running = server;
+        if (running != null && running.isRunning() && !running.isSameThread()) {
+            running.execute(ReloadHandler::rebuild);
+        } else {
+            rebuild();
+        }
+    }
+
+    private static void rebuild() {
         try {
             ZoneResolver.invalidate();
             BiomePatch.invalidate();

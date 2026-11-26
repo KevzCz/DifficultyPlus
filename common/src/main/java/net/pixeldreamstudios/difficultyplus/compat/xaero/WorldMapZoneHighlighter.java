@@ -50,7 +50,7 @@ public final class WorldMapZoneHighlighter extends ChunkHighlighter {
 
     @Override
     public int[] getChunkHighlitColor(ResourceKey<Level> dimension, int chunkX, int chunkZ) {
-        return ZoneStyles.drawn(MAP) && ZoneColours.fillQuarts(id(dimension), chunkX, chunkZ, scratch, this::setResult, MAP)
+        return ZoneStyles.drawn(MAP) && ZoneColours.fillQuarts(id(dimension), chunkX, chunkZ, scratch, this::write, MAP)
                 ? resultStore
                 : null;
     }
@@ -113,6 +113,10 @@ public final class WorldMapZoneHighlighter extends ChunkHighlighter {
                 ChunkPos.asLong(blockX >> 4, blockZ >> 4),
                 ZoneTooltips.quartOf(blockX, blockZ),
                 ClientConfig.get().show_resistances));
+    }
+
+    private void write(int x, int z, int argb) {
+        setResult(x, z, XaeroBridge.toXaeroColour(argb));
     }
 
     private static ResourceLocation id(ResourceKey<Level> dimension) {

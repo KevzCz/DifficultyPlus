@@ -44,6 +44,10 @@ public final class XaeroBridge {
         }
     }
 
+    static int toXaeroColour(int argb) {
+        return Integer.reverseBytes(argb);
+    }
+
     static ChunkPos regionToChunk(long key) {
         return new ChunkPos(key);
     }

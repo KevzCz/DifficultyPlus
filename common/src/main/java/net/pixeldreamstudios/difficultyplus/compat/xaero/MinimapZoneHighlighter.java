@@ -42,7 +42,7 @@ public final class MinimapZoneHighlighter extends ChunkHighlighter {
 
     @Override
     public int[] getChunkHighlitColor(ResourceKey<Level> dimension, int chunkX, int chunkZ) {
-        return ZoneStyles.drawn(MAP) && ZoneColours.fillQuarts(id(dimension), chunkX, chunkZ, scratch, this::setResult, MAP)
+        return ZoneStyles.drawn(MAP) && ZoneColours.fillQuarts(id(dimension), chunkX, chunkZ, scratch, this::write, MAP)
                 ? resultStore
                 : null;
     }
@@ -72,6 +72,10 @@ public final class MinimapZoneHighlighter extends ChunkHighlighter {
         for (Component line : lines) {
             compiler.addLine(line);
         }
+    }
+
+    private void write(int x, int z, int argb) {
+        setResult(x, z, XaeroBridge.toXaeroColour(argb));
     }
 
     private static ResourceLocation id(ResourceKey<Level> dimension) {

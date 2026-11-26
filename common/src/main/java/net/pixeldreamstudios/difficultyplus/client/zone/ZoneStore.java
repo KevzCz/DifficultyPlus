@@ -20,7 +20,7 @@ public final class ZoneStore {
 
     private static final int MAGIC = 0x445A4E31;
 
-    private static final int FORMAT = 2;
+    private static final int FORMAT = 3;
 
     public static Long2ObjectMap<ZoneChunkCache.Entry> read(String worldId,
                                                             ResourceLocation dimension,
